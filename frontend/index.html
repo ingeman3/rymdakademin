@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rymdakademin - Solsystemsresan</title>
+    <link rel="stylesheet" href="/styles/app.css">
+  </head>
+  <body>
+    <main class="solar-game" data-game="solar-system">
+      <p class="game-title">
+        <span>Rymdakademin</span>
+        <strong>Solsystemsresan</strong>
+      </p>
+
+      <section class="space-map" aria-label="Solsystem">
+        <div class="sun" aria-hidden="true"></div>
+        <div id="route" class="route"></div>
+        <div id="ship" class="ship" aria-label="Rymdskepp">
+          <svg viewBox="0 0 86 52" aria-hidden="true">
+            <path class="ship-wing" d="M22 31 8 45l30-4Z"></path>
+            <path class="ship-wing" d="M22 21 8 7l30 4Z"></path>
+            <path class="ship-body" d="M12 26C26 9 54 5 78 26 54 47 26 43 12 26Z"></path>
+            <circle class="ship-window" cx="53" cy="26" r="8"></circle>
+            <path class="ship-nose" d="M66 15c5 3 9 7 12 11-3 4-7 8-12 11 3-7 3-15 0-22Z"></path>
+          </svg>
+        </div>
+      </section>
+
+      <section class="stars-panel" aria-live="polite">
+        <span class="stars-label">Stjärnor</span>
+        <span id="starDisplay" class="star-display">☆ ☆ ☆ ☆ ☆ ☆ ☆</span>
+        <span id="scoreStatus" class="stars-count">0 / 7 uppdrag klara</span>
+      </section>
+
+      <section id="missionOverlay" class="mission-overlay" aria-live="polite" aria-hidden="true">
+        <div class="control-panel mission-popup" role="dialog" aria-labelledby="missionText">
+          <div>
+            <p id="missionText" class="mission-text">Landning klar.</p>
+            <div class="planet-fact-card">
+              <span id="popupPlanetIcon" class="popup-planet-icon" aria-hidden="true"></span>
+              <p id="planetFactText" class="planet-fact-text">Planeten väntar på dig.</p>
+            </div>
+            <p id="mathPromptText" class="math-prompt-text">Lös talet för att flyga vidare</p>
+            <p id="questionText" class="question-text">0 + 0 = ?</p>
+          </div>
+          <div id="answers" class="answers"></div>
+          <p id="feedbackText" class="feedback">Lös talet för att flyga vidare.</p>
+          <p id="speechText" class="sr-only"></p>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="/js/app.js"></script>
+  </body>
+</html>
