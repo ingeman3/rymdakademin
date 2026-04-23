@@ -28,12 +28,20 @@ const WARP_STREAK_COUNT = 25;
 
 const warpContainer = document.getElementById('warp-container');
 const pilotsEl = document.getElementById('pilots');
+const pilotEmptyTagline = document.getElementById('pilot-empty-tagline');
 const missionsEl = document.getElementById('missions');
 const newPilotForm = document.getElementById('new-pilot-form');
 const newPilotInput = document.getElementById('new-pilot-name');
 const newPilotError = document.getElementById('new-pilot-error');
 const btnCancel = document.getElementById('btn-cancel-pilot');
 const btnSave = document.getElementById('btn-save-pilot');
+
+function openNewPilotForm() {
+  newPilotForm.classList.add('open');
+  newPilotInput.value = '';
+  newPilotError.textContent = '';
+  newPilotInput.focus();
+}
 
 const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -73,11 +81,38 @@ function pilotStatsText(pilot) {
   return `\u2B50 ${stars} \u00B7 ${rank}`;
 }
 
-function renderPilots() {
-  const pilots = getAllPilots();
-  const selectedId = getSelectedPilotId();
+function renderEmptyState() {
+  // First-visit / post-wipe onboarding. One big cyan-glow card with a
+  // plus glyph and Swedish copy inviting the user to create their
+  // first pilot. Tagline below explains why pilots exist.
+  pilotsEl.classList.add('pilots-empty');
 
-  pilotsEl.innerHTML = '';
+  const card = document.createElement('button');
+  card.type = 'button';
+  card.className = 'pilot-empty-card';
+  card.setAttribute('aria-label', 'Skapa din första pilot');
+
+  const plus = document.createElement('span');
+  plus.className = 'pilot-empty-plus';
+  plus.setAttribute('aria-hidden', 'true');
+  plus.textContent = '+';
+
+  const label = document.createElement('span');
+  label.className = 'pilot-empty-label';
+  label.textContent = 'Skapa din första pilot';
+
+  card.appendChild(plus);
+  card.appendChild(label);
+  card.addEventListener('click', openNewPilotForm);
+
+  pilotsEl.appendChild(card);
+
+  if (pilotEmptyTagline) pilotEmptyTagline.hidden = false;
+}
+
+function renderPilotGrid(pilots, selectedId) {
+  pilotsEl.classList.remove('pilots-empty');
+  if (pilotEmptyTagline) pilotEmptyTagline.hidden = true;
 
   pilots.forEach((p) => {
     const btn = document.createElement('button');
@@ -129,13 +164,22 @@ function renderPilots() {
 
   addBtn.appendChild(addAvatar);
   addBtn.appendChild(addName);
-  addBtn.addEventListener('click', () => {
-    newPilotForm.classList.add('open');
-    newPilotInput.value = '';
-    newPilotError.textContent = '';
-    newPilotInput.focus();
-  });
+  addBtn.addEventListener('click', openNewPilotForm);
   pilotsEl.appendChild(addBtn);
+}
+
+function renderPilots() {
+  const pilots = getAllPilots();
+  const selectedId = getSelectedPilotId();
+
+  pilotsEl.innerHTML = '';
+
+  if (pilots.length === 0) {
+    renderEmptyState();
+    return;
+  }
+
+  renderPilotGrid(pilots, selectedId);
 }
 
 function renderMissions() {
