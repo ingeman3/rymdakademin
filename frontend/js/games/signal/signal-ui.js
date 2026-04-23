@@ -13,13 +13,17 @@
 // message text are rendered via textContent. SVG icon markup is
 // never accepted from the caller.
 
+import { getIcon } from './messages-data.js';
+
 const LETTER_FLIGHT_MS = 600;
 const WRONG_SHAKE_MS = 300;
 const MESSAGE_GLOW_MS = 800;
 const STAR_FLIGHT_MS = 900;
 const POST_MESSAGE_HOLD_MS = 1500;
+const ICON_FADE_MS = 200;
 
 export function createSignalUi({
+  iconEl,
   messagePanelEl,
   letterPanelEl,
   completionEl,
@@ -48,7 +52,27 @@ export function createSignalUi({
     busyUntil = 0;
   }
 
+  function renderIcon(message) {
+    if (!iconEl) return;
+    iconEl.innerHTML = '';
+    if (!message || !message.icon) return;
+    const markup = getIcon(message.icon);
+    if (!markup) return;
+    // Trusted authored SVG from the hardcoded ICONS map — innerHTML
+    // is safe here (never caller-supplied markup).
+    iconEl.innerHTML =
+      `<svg viewBox="0 0 120 120" width="100%" height="100%" aria-hidden="true">${markup}</svg>`;
+    if (prefersReducedMotion()) return;
+    // Brief fade-in so the swap between messages doesn't snap.
+    iconEl.classList.remove('fade-in');
+    // Force a reflow so the animation replays on each render.
+    void iconEl.offsetWidth;
+    iconEl.classList.add('fade-in');
+    setTimeout(() => iconEl.classList.remove('fade-in'), ICON_FADE_MS + 40);
+  }
+
   function renderMessage(message, revealed, activeGap) {
+    renderIcon(message);
     messagePanelEl.innerHTML = '';
     charEls = [];
 
