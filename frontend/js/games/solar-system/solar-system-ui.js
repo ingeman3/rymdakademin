@@ -1,4 +1,6 @@
 import { easeInOutCubic, lerp, quadraticBezier } from '../../shared/math.js';
+import { getString, getJson } from '../../shared/storage.js';
+import { DEFAULT_PILOTS, STORAGE_KEYS } from '../../start/pilots-data.js';
 import { HOME_PLANET_INDEX, MISSION_PLANET_INDEXES, PLANETS, planetPoint } from './solar-system-data.js';
 
 export function createSolarSystemUi(handlers) {
@@ -24,6 +26,16 @@ export function createSolarSystemUi(handlers) {
   let animationFrame = null;
   const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
   const prefersReducedMotion = () => reducedMotionQuery.matches;
+  const pilotName = lookupPilotName();
+
+  function lookupPilotName() {
+    const selectedId = getString(STORAGE_KEYS.selectedPilot, null);
+    if (!selectedId) return null;
+    const pilots = getJson(STORAGE_KEYS.pilots, null);
+    const source = Array.isArray(pilots) && pilots.length > 0 ? pilots : DEFAULT_PILOTS;
+    const found = source.find((p) => p.id === selectedId);
+    return found && typeof found.name === 'string' ? found.name : null;
+  }
   const speechSupported = typeof window !== 'undefined'
     && 'speechSynthesis' in window
     && typeof window.SpeechSynthesisUtterance === 'function';
@@ -131,13 +143,20 @@ export function createSolarSystemUi(handlers) {
   }
 
   function showIntro(totalStars) {
+    const fact = 'Flyg till alla planeter och lös ett mattetal på varje. Samla alla stjärnor. Kom sen hem till Jorden.';
+    const factGreeting = pilotName ? `Hej ${pilotName}! ` : '';
+    const speechGreeting = pilotName ? `Hej ${pilotName}. ` : '';
+
     setPopupPlanet(HOME_PLANET_INDEX);
     missionText.textContent = 'Uppdrag från Jorden';
-    planetFactText.textContent = 'Flyg till alla planeter och lös ett mattetal på varje. Samla alla stjärnor. Kom sen hem till Jorden.';
+    // textContent so a pilot named "<script>" stays a string — set via
+    // storage from the start page where input is already validated, but
+    // the game must not trust it.
+    planetFactText.textContent = factGreeting + fact;
     mathPromptText.textContent = 'Solsystemsresan';
     questionText.textContent = `${totalStars} planeter väntar`;
     feedbackText.textContent = 'Tryck på knappen när du vill börja.';
-    speechText.textContent = 'Uppdrag från Jorden. Flyg till alla planeter och lös ett mattetal på varje. Samla alla stjärnor. Kom sen hem till Jorden.';
+    speechText.textContent = `Uppdrag från Jorden. ${speechGreeting}${fact}`;
     controlPanel.classList.remove('success', 'correct-pulse', 'wrong-pulse');
     answers.innerHTML = '';
     answers.appendChild(createActionButton('Starta uppdraget', handlers.onMissionStarted));
