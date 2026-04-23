@@ -373,7 +373,10 @@ body {
   }
 }
 
-.missions {
+/* :not([hidden]) so the `hidden` attribute actually hides the grid
+   when start.js toggles it — a plain `.missions { display: grid }`
+   author rule otherwise beats [hidden]'s UA display:none. */
+.missions:not([hidden]) {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 260px));
   gap: 20px;
