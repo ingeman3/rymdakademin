@@ -9,3 +9,15 @@ CREATE TABLE IF NOT EXISTS games (
   description TEXT,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Server-side backup of a player's full progression snapshot. The
+-- authenticated Cloudflare Access account email keys each row. The
+-- snapshot column holds the exact object produced by progress.js on
+-- the client (schemaVersion, selectedPilot, pilots{}) — validated for
+-- shape and size at the route level, then stored verbatim so future
+-- schema versions can migrate client-side without a DB migration.
+CREATE TABLE IF NOT EXISTS progress_snapshots (
+  account_email TEXT PRIMARY KEY,
+  snapshot JSONB NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
