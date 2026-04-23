@@ -290,6 +290,10 @@ app.get('/rymdminnet', (_req, res) => {
   res.sendFile(path.join(frontendPath, 'rymdminnet.html'));
 });
 
+app.get('/rymdsignalen', (_req, res) => {
+  res.sendFile(path.join(frontendPath, 'rymdsignalen.html'));
+});
+
 // Any other path falls through to the start page. Keeps deep links and
 // typos landing somewhere sensible instead of showing the game chrome.
 app.get('*', (_req, res) => {
