@@ -2,6 +2,7 @@ const path = require('path');
 const cors = require('cors');
 const express = require('express');
 const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const { query, pool } = require('./db');
@@ -50,6 +51,16 @@ app.use(
 app.use(cors());
 app.use(express.json());
 app.use(express.static(frontendPath));
+
+app.use(
+  '/api',
+  rateLimit({
+    windowMs: 60_000,
+    max: 120,
+    standardHeaders: true,
+    legacyHeaders: false,
+  })
+);
 
 app.get('/api/health', async (_req, res) => {
   try {
