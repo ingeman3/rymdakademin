@@ -30,6 +30,7 @@ const warpContainer = document.getElementById('warp-container');
 const pilotsEl = document.getElementById('pilots');
 const pilotEmptyTagline = document.getElementById('pilot-empty-tagline');
 const missionsEl = document.getElementById('missions');
+const missionHeadingEl = document.getElementById('mission-heading');
 const newPilotForm = document.getElementById('new-pilot-form');
 const newPilotInput = document.getElementById('new-pilot-name');
 const newPilotError = document.getElementById('new-pilot-error');
@@ -168,6 +169,11 @@ function renderPilotGrid(pilots, selectedId) {
   pilotsEl.appendChild(addBtn);
 }
 
+function setMissionSectionVisible(visible) {
+  if (missionHeadingEl) missionHeadingEl.hidden = !visible;
+  if (missionsEl) missionsEl.hidden = !visible;
+}
+
 function renderPilots() {
   const pilots = getAllPilots();
   const selectedId = getSelectedPilotId();
@@ -176,10 +182,14 @@ function renderPilots() {
 
   if (pilots.length === 0) {
     renderEmptyState();
+    // No pilots -> nothing to play as; hide the entire mission
+    // section so the child's attention lands on the onboarding card.
+    setMissionSectionVisible(false);
     return;
   }
 
   renderPilotGrid(pilots, selectedId);
+  setMissionSectionVisible(true);
 }
 
 function renderMissions() {
