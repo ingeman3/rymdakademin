@@ -9,10 +9,18 @@
 // minimal playable loop: shuffle → click pairs → detect win → log.
 
 import { createGameShell } from '../../shared/game-shell.js';
-import { enableServerSync, getSelectedPilotId } from '../../shared/progress.js';
+import { enableServerSync, getSelectedPilot, getSelectedPilotId } from '../../shared/progress.js';
 import { createMemoryGame } from './memory-game.js';
 import { createMemoryUi } from './memory-ui.js';
 import { getMotifById } from './memory-data.js';
+
+// Ranks that trigger the 4-second peek at game start. Higher ranks
+// have earned their way past the training wheels.
+const PEEK_RANKS = new Set(['kadett', 'pilot']);
+function shouldPeek(pilot) {
+  if (!pilot) return true; // fresh visitor without stars — give them the peek
+  return PEEK_RANKS.has(pilot.rank || 'kadett');
+}
 
 const pageRoot = document.querySelector('.memory-page');
 const boardEl = document.getElementById('memory-board');
@@ -57,11 +65,26 @@ const game = createMemoryGame({
   },
 });
 
-function startGame() {
-  game.reset();
+async function startGame() {
   ui.hideCompletion();
-  ui.renderBoard(game.state.cards);
+  // start() re-shuffles; then we render the board from the fresh
+  // state.cards so the DOM matches what click() will operate on.
   game.start();
+  ui.renderBoard(game.state.cards);
+
+  const pilot = getSelectedPilot();
+  const peek = shouldPeek(pilot) && !ui.prefersReducedMotion();
+  if (peek) {
+    // During peek, the click-handler in memory-game is still live
+    // (state.started is already true) but the UI locks pointer events
+    // on every card. After the 4 s window we cascade them face-down
+    // and release input.
+    ui.revealAllForPeek();
+    ui.lockInput(true);
+    await new Promise((resolve) => setTimeout(resolve, ui.PEEK_DURATION_MS));
+    await ui.hideAllAfterPeek();
+    ui.lockInput(false);
+  }
 }
 
 // Expose a tiny debugging handle so manual verification from the

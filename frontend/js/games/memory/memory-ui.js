@@ -230,9 +230,15 @@ export function createMemoryUi({ boardEl, completionEl, onCardClick, onReplay, o
       if (locked) {
         el.setAttribute('aria-disabled', 'true');
         el.dataset.locked = '1';
+        // Preserve `disabled` on already-matched cards — the `disabled`
+        // attribute is what blocks Enter/Space from invoking the click
+        // handler, so setting it on everything during peek keeps the
+        // lock effective against keyboard users too.
+        if (!el.classList.contains('matched')) el.disabled = true;
       } else {
         el.removeAttribute('aria-disabled');
         delete el.dataset.locked;
+        if (!el.classList.contains('matched')) el.disabled = false;
       }
     });
     boardEl.classList.toggle('locked', !!locked);

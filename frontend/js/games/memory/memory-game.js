@@ -53,6 +53,9 @@ export function createMemoryGame(callbacks = {}) {
   }
 
   function start() {
+    // Re-shuffle the deck and flag click handling active. Callers
+    // should render the board from state.cards AFTER start() so the
+    // DOM reflects the same deck that click() will operate on.
     reset();
     state.started = true;
   }
