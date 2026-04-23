@@ -1,5 +1,4 @@
 const path = require('path');
-const cors = require('cors');
 const express = require('express');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
@@ -48,8 +47,6 @@ app.use(
     crossOriginEmbedderPolicy: false,
   })
 );
-app.use(cors());
-app.use(express.json());
 app.use(express.static(frontendPath));
 
 app.use(
@@ -83,6 +80,10 @@ app.get('/api/games/:gameId', (req, res) => {
   }
 
   return res.json(game);
+});
+
+app.use('/api', (_req, res) => {
+  res.status(404).json({ message: 'Hittades inte.' });
 });
 
 app.get('*', (_req, res) => {
