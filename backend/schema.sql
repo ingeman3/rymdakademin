@@ -1,3 +1,6 @@
+-- The games catalogue lives in backend/src/server.js (array constant).
+-- This table is created empty so future persistence features have a
+-- place to land; the API does not read from it yet.
 CREATE TABLE IF NOT EXISTS games (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
@@ -6,17 +9,3 @@ CREATE TABLE IF NOT EXISTS games (
   description TEXT,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-
-INSERT INTO games (id, name, status, path, description)
-VALUES
-  ('solar-system', 'Solsystemsresan', 'active', '/', 'Ett barnvänligt matteäventyr genom solsystemet.'),
-  ('letter-hunt', 'Bokstavsjakten', 'planned', NULL, NULL),
-  ('spelling-rocket', 'Stavningsraketen', 'planned', NULL, NULL),
-  ('space-memory', 'Rymdminnet', 'planned', NULL, NULL),
-  ('number-station', 'Sifferstationen', 'planned', NULL, NULL)
-ON CONFLICT (id) DO UPDATE SET
-  name = EXCLUDED.name,
-  status = EXCLUDED.status,
-  path = EXCLUDED.path,
-  description = EXCLUDED.description,
-  updated_at = NOW();

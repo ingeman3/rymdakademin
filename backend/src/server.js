@@ -10,6 +10,9 @@ const app = express();
 const port = Number(process.env.PORT || 3000);
 const frontendPath = path.join(__dirname, '..', '..', 'frontend');
 
+// Source of truth for the games catalogue. The `games` table in Postgres
+// holds the same schema but is not read from yet; when a persistence
+// feature ships, flip /api/games to query the DB instead of this array.
 const games = [
   {
     id: 'solar-system',
@@ -75,41 +78,6 @@ app.get('*', (_req, res) => {
   res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
-async function ensureDatabase() {
-  await query(`
-    CREATE TABLE IF NOT EXISTS games (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      status TEXT NOT NULL,
-      path TEXT,
-      description TEXT,
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `);
-
-  for (const game of games) {
-    await query(
-      `INSERT INTO games (id, name, status, path, description, updated_at)
-       VALUES ($1, $2, $3, $4, $5, NOW())
-       ON CONFLICT (id)
-       DO UPDATE SET
-         name = EXCLUDED.name,
-         status = EXCLUDED.status,
-         path = EXCLUDED.path,
-         description = EXCLUDED.description,
-         updated_at = NOW()`,
-      [game.id, game.name, game.status, game.path || null, game.description || null]
-    );
-  }
-}
-
-ensureDatabase()
-  .then(() => {
-    app.listen(port, () => {
-      console.log(`Rymdakademin körs på port ${port}`);
-    });
-  })
-  .catch((error) => {
-    console.error('Kunde inte starta Rymdakademin:', error);
-    process.exit(1);
-  });
+app.listen(port, () => {
+  console.log(`Rymdakademin körs på port ${port}`);
+});
