@@ -18,11 +18,31 @@ export function createSolarSystemUi(handlers) {
   const feedbackText = document.getElementById('feedbackText');
   const speechText = document.getElementById('speechText');
   const starsPanel = document.querySelector('.stars-panel');
+  const readAloudBtn = document.getElementById('readAloudBtn');
 
   let shipPosition = planetPoint(HOME_PLANET_INDEX);
   let animationFrame = null;
   const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
   const prefersReducedMotion = () => reducedMotionQuery.matches;
+  const speechSupported = typeof window !== 'undefined'
+    && 'speechSynthesis' in window
+    && typeof window.SpeechSynthesisUtterance === 'function';
+
+  if (readAloudBtn && speechSupported) {
+    readAloudBtn.hidden = false;
+    readAloudBtn.addEventListener('click', readAloud);
+  }
+
+  function readAloud() {
+    if (!speechSupported) return;
+    const text = speechText.textContent.trim();
+    if (!text) return;
+    window.speechSynthesis.cancel();
+    const utter = new window.SpeechSynthesisUtterance(text);
+    utter.lang = 'sv-SE';
+    utter.rate = 0.95;
+    window.speechSynthesis.speak(utter);
+  }
 
   function setupPlanets() {
     route.innerHTML = '';
@@ -341,6 +361,10 @@ export function createSolarSystemUi(handlers) {
   }
 
   function closeMissionPopup(onClosed) {
+    if (speechSupported) {
+      window.speechSynthesis.cancel();
+    }
+
     if (!missionOverlay.classList.contains('open')) {
       if (onClosed) {
         onClosed();
