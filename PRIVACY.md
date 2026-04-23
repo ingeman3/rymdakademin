@@ -8,14 +8,29 @@ till svensk dataskyddsreglering.*
 
 **Rymdakademin samlar inte in några personuppgifter.** Spelet
 körs helt i barnets webbläsare. Det finns ingen inloggning,
-inga konton, ingen profil, inga resultat som sparas någonstans,
-och ingen data lämnar barnets enhet.
+inga konton, ingen profil på någon server, och ingen data
+lämnar barnets enhet.
+
+Det enda som sparas lokalt i webbläsaren är barnets val av
+"pilot" på startsidan – ett smeknamn som barnet själv hittar
+på, plus vilken pilot som senast valdes. Detta är inte
+personuppgifter i GDPR:s mening: vi begär inte och vi tar inte
+emot namn, e-post, ålder, plats eller något annat som kan
+kopplas till en verklig person. Barnet kan skriva "Nova",
+"Draken" eller "Kakmonster" – spelet bryr sig inte. Data
+finns kvar på enheten tills användaren rensar webbläsardata
+eller raderar appen.
 
 Konkret betyder det att **ingen av följande teknik används**:
 
 - Inga kakor (cookies).
-- Ingen `localStorage` eller `sessionStorage` som identifierar
-  barnet.
+- Ingen `localStorage`- eller `sessionStorage`-nyckel som
+  **identifierar** barnet. Nycklarna
+  `rymdakademin.pilots.v1` och
+  `rymdakademin.selectedPilot.v1` innehåller ett självvalt
+  smeknamn utan koppling till riktigt namn, personnummer,
+  e-post eller annan identitetsmarkör, och de lämnar aldrig
+  enheten.
 - Ingen analysmjukvara (Google Analytics, Plausible, Matomo,
   eller liknande).
 - Inga tredjepartsskript eller externa tjänster (inga
@@ -25,6 +40,18 @@ Konkret betyder det att **ingen av följande teknik används**:
   nödvändigt för att webbservern ska fungera.
 - Ingen profilering, ingen riktad reklam, ingen ansiktsigenkänning.
 - Inga API-anrop som lämnar vår egen server.
+
+### Så rensar man pilotvalet
+
+Vill man ta bort smeknamnet och börja om går det att göra i
+webbläsaren:
+
+- Chrome/Edge: *Inställningar → Sekretess och säkerhet →
+  Rensa webbplatsdata → ange webbplatsens adress.*
+- Safari: *Inställningar → Sekretess → Hantera
+  webbplatsdata.*
+- Firefox: *Inställningar → Sekretess och säkerhet → Kakor
+  och webbplatsdata → Rensa data.*
 
 ## Varför detta är viktigt för ett spel för barn
 
@@ -49,10 +76,16 @@ Detta dokument är korrekt så länge listan ovan stämmer. Följande
 framtida ändringar skulle innebära att vi behandlar personuppgifter
 och att dokumentet **måste** skrivas om innan ändringen släpps:
 
-- **Framsteg/stjärnor sparas mellan besök** – även om det bara är
-  en anonym `localStorage`-nyckel räknas det ofta som "kaka eller
-  liknande teknik" enligt LEK 9 kap. 28 §, och en slumpvis
-  identifierare kan i vissa fall räknas som en personuppgift.
+- **Framsteg/stjärnor eller annan historik sparas mellan besök**
+  – även om det bara är en anonym `localStorage`-nyckel räknas
+  det ofta som "kaka eller liknande teknik" enligt LEK 9 kap.
+  28 §, och en slumpvis identifierare kan i vissa fall räknas
+  som en personuppgift. Pilotsmeknamnet från startsidan är en
+  avsiktlig avgränsning: det är ett fritext-smeknamn som barnet
+  själv hittar på, inte ett slumpvist id och inte en
+  identifierare – den dagen vi börjar generera ett persistent
+  anonymt id eller kopplar stjärnor per pilot över tid behöver
+  denna policy skrivas om.
 - **Inloggning, konton eller profiler** – kräver i princip alltid
   GDPR-K-anpassad samtyckesflöde med vårdnadshavarens godkännande
   om användaren kan vara under 13.
