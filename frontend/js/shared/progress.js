@@ -16,6 +16,11 @@ import { getString, setString, getJson, setJson } from './storage.js';
 export const STORAGE_KEY = 'rymdakademin.progress.v1';
 export const SCHEMA_VERSION = 1;
 
+// Phase 4 storage keys. Read once on first phase-5 load to rescue the
+// pilot roster + selection, then deleted. Never written from phase 5.
+const LEGACY_PILOTS_KEY = 'rymdakademin.pilots.v1';
+const LEGACY_SELECTED_KEY = 'rymdakademin.selectedPilot.v1';
+
 const DEFAULT_PILOTS = [
   { id: 'harry',   name: 'Harry',   color: '#d85a30', icon: 'rocket' },
   { id: 'ted',     name: 'Ted',     color: '#378add', icon: 'bolt' },
@@ -83,6 +88,42 @@ function loadFromStorage() {
   return null;
 }
 
+// One-time migration from phase 4. If the v1 progress key is absent
+// but the phase 4 pilots/selectedPilot keys exist, convert them into a
+// fresh snapshot (stars zero, rank kadett, timestamps = now) and
+// delete the old keys. Runs at most once per browser: as soon as the
+// new key is written, subsequent loads hit loadFromStorage() first.
+function migrateFromPhase4() {
+  const legacyPilots = getJson(LEGACY_PILOTS_KEY, null);
+  const legacySelected = getString(LEGACY_SELECTED_KEY, null);
+  if (!Array.isArray(legacyPilots) || legacyPilots.length === 0) return null;
+
+  const snap = emptySnapshot();
+  for (const entry of legacyPilots) {
+    if (!entry || typeof entry.id !== 'string' || typeof entry.name !== 'string') continue;
+    snap.pilots[entry.id] = freshPilot({
+      id: entry.id,
+      name: entry.name,
+      color: entry.color || '#378add',
+      icon: entry.icon || 'star',
+    });
+  }
+  if (legacySelected && snap.pilots[legacySelected]) {
+    snap.selectedPilot = legacySelected;
+  } else {
+    snap.selectedPilot = Object.keys(snap.pilots)[0] || null;
+  }
+
+  // Wipe the legacy keys so we never read them again. If writes fail
+  // (quota) that's fine — next boot will re-migrate into the same
+  // shape and the resulting snapshot is idempotent.
+  try {
+    window.localStorage.removeItem(LEGACY_PILOTS_KEY);
+    window.localStorage.removeItem(LEGACY_SELECTED_KEY);
+  } catch (_) { /* ignore */ }
+  return snap;
+}
+
 function persist(snapshot) {
   const ok = setJson(STORAGE_KEY, snapshot);
   if (!ok) {
@@ -94,6 +135,11 @@ export function getSnapshot() {
   if (memorySnapshot) return memorySnapshot;
   const loaded = loadFromStorage();
   if (loaded) return loaded;
+  const migrated = migrateFromPhase4();
+  if (migrated) {
+    persist(migrated);
+    return migrated;
+  }
   const fresh = emptySnapshot();
   seedDefaults(fresh);
   persist(fresh);
