@@ -386,6 +386,26 @@ body {
   justify-content: center;
 }
 
+.signal-intro-body {
+  margin: 0 0 12px;
+  color: #edf8ff;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  font-weight: 600;
+  line-height: 1.5;
+  max-width: 560px;
+  text-align: center;
+}
+
+.signal-intro-hint {
+  margin: 0 0 24px;
+  color: var(--cyan, #65f7ff);
+  font-size: clamp(0.88rem, 1.6vw, 1.05rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
 .signal-action {
   min-height: 56px;
   padding: 14px 22px;

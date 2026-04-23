@@ -304,6 +304,53 @@ export function createSignalUi({
     completionEl.innerHTML = '';
   }
 
+  function showIntro({ onStart }) {
+    // Narrative intro shown once per session (not on replay). Reuses
+    // the completion overlay element to avoid adding more DOM — the
+    // overlay is always at z-index 50 with backdrop-blur and fills
+    // the viewport, which is exactly what the intro needs.
+    if (!completionEl) {
+      if (typeof onStart === 'function') onStart();
+      return;
+    }
+    completionEl.innerHTML = '';
+
+    const title = document.createElement('h2');
+    title.className = 'signal-completion-title';
+    title.textContent = 'Signalen är bruten!';
+
+    const body = document.createElement('p');
+    body.className = 'signal-intro-body';
+    body.textContent = 'Jorden har tappat kontakten med rymdpiloterna. Hjälp till att fixa signalen genom att fylla i bokstäverna som saknas.';
+
+    const hint = document.createElement('p');
+    hint.className = 'signal-intro-hint';
+    hint.textContent = 'Klicka på rätt bokstav för att fylla i luckan.';
+
+    const actions = document.createElement('div');
+    actions.className = 'signal-completion-actions';
+
+    const starta = document.createElement('button');
+    starta.type = 'button';
+    starta.className = 'signal-action primary';
+    starta.textContent = 'Starta';
+    starta.addEventListener('click', () => {
+      hideCompletion();
+      if (typeof onStart === 'function') onStart();
+    });
+
+    actions.appendChild(starta);
+
+    completionEl.appendChild(title);
+    completionEl.appendChild(body);
+    completionEl.appendChild(hint);
+    completionEl.appendChild(actions);
+
+    completionEl.hidden = false;
+    completionEl.setAttribute('aria-hidden', 'false');
+    setTimeout(() => { starta.focus(); }, 0);
+  }
+
   return {
     renderMessage,
     setActiveGap,
@@ -313,6 +360,7 @@ export function createSignalUi({
     showMessageComplete,
     showCompletion,
     hideCompletion,
+    showIntro,
     speakMessage,
     cancelSpeech,
     isBusy,

@@ -24,6 +24,11 @@ import { createSignalUi } from './signal-ui.js';
 
 const GAME_ID = 'signal';
 
+// Captured at session start so the per-message addStars calls can be
+// undone on the playCount axis at the end of the session — spec
+// expects playCount to count *completions*, not messages.
+let sessionStartPlayCount = 0;
+
 const pageRoot = document.querySelector('.signal-page');
 const messagePanelEl = document.getElementById('signal-message');
 const letterPanelEl = document.getElementById('signal-letters');
@@ -82,7 +87,13 @@ const game = createSignalGame({
   onSessionComplete: (_result) => {
     const pilotId = getSelectedPilotId();
     if (pilotId) {
+      // addStars was called 7 times (one per message) to animate the
+      // shell counter tick by tick. That also bumped playCount +7.
+      // For Rymdsignalen, a "play" is the full 7-message session, so
+      // rewrite playCount to one above whatever it was at session
+      // start.
       setGameProgress(pilotId, GAME_ID, {
+        playCount: sessionStartPlayCount + 1,
         lastPlayedAt: new Date().toISOString(),
       });
     }
@@ -103,6 +114,8 @@ function startSession() {
 
   const pilot = getSelectedPilot();
   const rank = (pilot && pilot.rank) || 'kadett';
+  const prior = pilot && pilot.games && pilot.games[GAME_ID];
+  sessionStartPlayCount = prior && Number.isFinite(prior.playCount) ? prior.playCount : 0;
   game.start(rank);
 
   ui.renderLetters(game.state.letters);
@@ -117,4 +130,14 @@ function startSession() {
 // deterministically.
 window.__signal = { game, ui, startSession };
 
+// Render the board behind the intro so the page isn't blank if the
+// narrative overlay is dismissed fast, then show the intro on top.
 startSession();
+ui.showIntro({
+  onStart: () => {
+    // Re-shuffle with a fresh session so the child sees the game
+    // begin when they press Starta (avoids the distracting
+    // possibility of the background board showing pre-seeded state).
+    startSession();
+  },
+});
