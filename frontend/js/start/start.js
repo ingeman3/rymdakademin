@@ -10,8 +10,9 @@ import {
 } from '../shared/progress.js';
 
 const MISSIONS = [
-  { id: 'solar',   name: 'Solsystemsresan', status: 'active', icon: 'globe', bgColor: 'bg-blue', href: '/solsystemsresan' },
-  { id: 'minne',   name: 'Rymdminnet',      status: 'active', icon: 'brain', bgColor: 'bg-gray', href: '/rymdminnet' },
+  { id: 'solar',   name: 'Solsystemsresan', status: 'active', icon: 'globe', bgColor: 'bg-blue',   href: '/solsystemsresan' },
+  { id: 'minne',   name: 'Rymdminnet',      status: 'active', icon: 'brain', bgColor: 'bg-gray',   href: '/rymdminnet' },
+  { id: 'signal',  name: 'Rymdsignalen',    status: 'active', icon: 'radio', bgColor: 'bg-purple', href: '/rymdsignalen' },
   { id: 'bokstav', name: 'Bokstavsjakten',  status: 'locked', icon: 'abc',   bgColor: 'bg-gray' },
 ];
 
