@@ -76,7 +76,7 @@ button:focus-visible,
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-rows: minmax(390px, 1fr) auto;
+  grid-template-rows: auto minmax(390px, 1fr) auto;
   gap: clamp(16px, 2.6vw, 26px);
   min-height: 100vh;
   padding: clamp(16px, 3vw, 34px);

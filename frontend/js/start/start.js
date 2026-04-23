@@ -1,16 +1,27 @@
-import { getString, setString, getJson, setJson } from '../shared/storage.js';
+import { NEW_PILOT_COLORS, ICONS } from './pilots-data.js';
 import {
-  DEFAULT_PILOTS,
-  NEW_PILOT_COLORS,
-  ICONS,
-  STORAGE_KEYS,
-} from './pilots-data.js';
+  getAllPilots,
+  getSelectedPilotId,
+  setSelectedPilot,
+  createPilot,
+  getRank,
+  onChange,
+  enableServerSync,
+} from '../shared/progress.js';
 
 const MISSIONS = [
   { id: 'solar',   name: 'Solsystemsresan', status: 'active', icon: 'globe', bgColor: 'bg-blue', href: '/solsystemsresan' },
   { id: 'minne',   name: 'Rymdminnet',      status: 'locked', icon: 'brain', bgColor: 'bg-gray' },
   { id: 'bokstav', name: 'Bokstavsjakten',  status: 'locked', icon: 'abc',   bgColor: 'bg-gray' },
 ];
+
+const RANK_LABEL = {
+  kadett: 'Kadett',
+  pilot: 'Pilot',
+  kapten: 'Kapten',
+  rymdforskare: 'Rymdforskare',
+  amiral: 'Amiral',
+};
 
 const WARP_STREAK_COUNT = 25;
 
@@ -40,27 +51,6 @@ if (!prefersReduced) {
   }
 }
 
-let pilots = loadPilots();
-let selectedPilotId = loadSelected();
-
-function loadPilots() {
-  const stored = getJson(STORAGE_KEYS.pilots, null);
-  if (Array.isArray(stored) && stored.length > 0) return stored;
-  return DEFAULT_PILOTS.slice();
-}
-
-function loadSelected() {
-  return getString(STORAGE_KEYS.selectedPilot, 'ted');
-}
-
-function persistPilots() {
-  setJson(STORAGE_KEYS.pilots, pilots);
-}
-
-function persistSelected(id) {
-  setString(STORAGE_KEYS.selectedPilot, id);
-}
-
 function validatePilotName(name) {
   const trimmed = name.trim();
   if (trimmed.length === 0) return 'Skriv ett namn.';
@@ -76,15 +66,24 @@ function iconSvg(name, size = 36) {
   return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" stroke-linecap="round" stroke-linejoin="round">${ICONS[name] || ''}</svg>`;
 }
 
+function pilotStatsText(pilot) {
+  const stars = pilot.totalStars || 0;
+  const rank = RANK_LABEL[pilot.rank] || RANK_LABEL[getRank(stars)];
+  return `\u2B50 ${stars} \u00B7 ${rank}`;
+}
+
 function renderPilots() {
+  const pilots = getAllPilots();
+  const selectedId = getSelectedPilotId();
+
   pilotsEl.innerHTML = '';
 
   pilots.forEach((p) => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'pilot' + (p.id === selectedPilotId ? ' selected' : '');
+    btn.className = 'pilot' + (p.id === selectedId ? ' selected' : '');
     btn.setAttribute('aria-label', `Välj pilot ${p.name}`);
-    btn.setAttribute('aria-pressed', p.id === selectedPilotId ? 'true' : 'false');
+    btn.setAttribute('aria-pressed', p.id === selectedId ? 'true' : 'false');
 
     const avatar = document.createElement('div');
     avatar.className = 'pilot-avatar';
@@ -97,10 +96,19 @@ function renderPilots() {
 
     btn.appendChild(avatar);
     btn.appendChild(nameEl);
+
+    // Show stats only for the currently selected pilot — avoids a
+    // cluttered row of faint numbers and makes the selection itself
+    // feel more like a profile summary.
+    if (p.id === selectedId) {
+      const stats = document.createElement('span');
+      stats.className = 'pilot-stats';
+      stats.textContent = pilotStatsText(p);
+      btn.appendChild(stats);
+    }
+
     btn.addEventListener('click', () => {
-      selectedPilotId = p.id;
-      persistSelected(selectedPilotId);
-      renderPilots();
+      setSelectedPilot(p.id);
     });
     pilotsEl.appendChild(btn);
   });
@@ -193,13 +201,10 @@ function submitNewPilot() {
   }
   const trimmed = raw.trim();
   const id = `custom_${Date.now()}`;
-  const color = NEW_PILOT_COLORS[pilots.length % NEW_PILOT_COLORS.length];
-  pilots.push({ id, name: trimmed, color, icon: 'star' });
-  persistPilots();
-  selectedPilotId = id;
-  persistSelected(selectedPilotId);
+  const existingCount = getAllPilots().length;
+  const color = NEW_PILOT_COLORS[existingCount % NEW_PILOT_COLORS.length];
+  createPilot({ id, name: trimmed, color, icon: 'star' });
   newPilotForm.classList.remove('open');
-  renderPilots();
 }
 
 btnCancel.addEventListener('click', () => {
@@ -217,5 +222,15 @@ newPilotInput.addEventListener('keydown', (e) => {
   }
 });
 
+// Re-render whenever progress state changes — setSelectedPilot and
+// createPilot both fire onChange, so we no longer need to call
+// renderPilots() manually inside those click handlers.
+onChange(renderPilots);
+
 renderPilots();
 renderMissions();
+
+// Pull any newer snapshot from the server in the background and push
+// future local changes back. See enableServerSync() in progress.js —
+// idempotent, shared between start and game pages.
+enableServerSync();

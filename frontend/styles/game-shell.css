@@ -1,0 +1,142 @@
+/* Shared header for in-game pages: back button + pilot display.
+   Follows the phase 4 visual language (dark glass, subtle border)
+   so it sits comfortably on any game background. */
+
+.game-shell {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px clamp(16px, 3vw, 28px);
+  background: rgba(12, 22, 52, 0.82);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(101, 247, 255, 0.22);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: #fff;
+}
+
+.game-shell-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(2, 8, 24, 0.45);
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.game-shell-back svg {
+  stroke: #fff;
+  fill: none;
+  stroke-width: 2;
+}
+
+.game-shell-back:hover {
+  border-color: rgba(101, 247, 255, 0.6);
+  box-shadow: 0 0 14px rgba(101, 247, 255, 0.2);
+}
+
+.game-shell-pilot {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.game-shell-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
+}
+
+.game-shell-name {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.game-shell-stars {
+  color: var(--amber, #ffd166);
+  letter-spacing: 0.02em;
+}
+
+/* Compact on small screens — back button becomes icon-only. */
+@media (max-width: 500px) {
+  .game-shell-back-label {
+    display: none;
+  }
+  .game-shell-back {
+    padding: 8px 12px;
+  }
+}
+
+/* Rank-celebration overlay (used by rank-celebration.js). Full-screen
+   darkened backdrop with a large badge that lands, holds ~2.5 s, and
+   fades out. */
+.rank-celebration {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  gap: 18px;
+  background: rgba(1, 5, 18, 0.72);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 260ms ease;
+}
+.rank-celebration.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.rank-celebration-badge {
+  padding: 18px 36px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 209, 102, 0.68);
+  background: linear-gradient(180deg, rgba(255, 209, 102, 0.22), rgba(39, 61, 136, 0.95));
+  color: var(--amber, #ffd166);
+  font-size: clamp(2.2rem, 6vw, 3.8rem);
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-shadow: 0 0 24px rgba(255, 209, 102, 0.72);
+  box-shadow: 0 0 40px rgba(255, 209, 102, 0.38), 0 8px 0 #07152c;
+  transform: scale(0.8);
+  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.rank-celebration.visible .rank-celebration-badge {
+  transform: scale(1);
+}
+
+.rank-celebration-line {
+  margin: 0;
+  color: var(--ink, #f8fbff);
+  font-size: clamp(1.1rem, 2.6vw, 1.55rem);
+  font-weight: 700;
+  text-align: center;
+  text-shadow: 0 0 14px rgba(101, 247, 255, 0.32);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rank-celebration,
+  .rank-celebration-badge {
+    transition: none !important;
+  }
+}

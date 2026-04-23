@@ -268,6 +268,15 @@ body {
   color: #fff;
 }
 
+/* Shown below the selected pilot's name: "⭐ 12 · Kadett". Softer
+   color than the name so it reads as secondary info. */
+.pilot-stats {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.02em;
+}
+
 .pilot-new .pilot-avatar {
   background: transparent;
   border: 2px dashed rgba(255,255,255,0.25);
