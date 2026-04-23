@@ -3,58 +3,48 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Rymdakademin - Solsystemsresan</title>
+    <title>Rymdakademin</title>
     <link rel="stylesheet" href="/styles/app.css">
+    <link rel="stylesheet" href="/styles/start.css">
   </head>
   <body>
-    <main class="solar-game" data-game="solar-system">
-      <p class="game-title">
-        <span>Rymdakademin</span>
-        <strong>Solsystemsresan</strong>
-      </p>
+    <div class="rymd-root" id="rymd-root">
+      <div class="nebula nebula-1" aria-hidden="true"></div>
+      <div class="nebula nebula-2" aria-hidden="true"></div>
+      <div class="nebula nebula-3" aria-hidden="true"></div>
 
-      <section class="space-map" aria-label="Solsystem">
-        <div class="sun" aria-hidden="true"></div>
-        <div id="route" class="route"></div>
-        <div id="ship" class="ship" aria-label="Rymdskepp">
-          <svg viewBox="0 0 86 52" aria-hidden="true">
-            <path class="ship-wing" d="M22 31 8 45l30-4Z"></path>
-            <path class="ship-wing" d="M22 21 8 7l30 4Z"></path>
-            <path class="ship-body" d="M12 26C26 9 54 5 78 26 54 47 26 43 12 26Z"></path>
-            <circle class="ship-window" cx="53" cy="26" r="8"></circle>
-            <path class="ship-nose" d="M66 15c5 3 9 7 12 11-3 4-7 8-12 11 3-7 3-15 0-22Z"></path>
-          </svg>
-        </div>
-      </section>
+      <div class="starfield" aria-hidden="true">
+        <div class="stars-far"></div>
+        <div class="stars-mid"></div>
+        <div class="stars-near"></div>
+      </div>
 
-      <section class="stars-panel" aria-live="polite">
-        <span class="stars-label">Stjärnor</span>
-        <span id="starDisplay" class="star-display">☆ ☆ ☆ ☆ ☆ ☆ ☆</span>
-        <span id="scoreStatus" class="stars-count">0 / 7 uppdrag klara</span>
-      </section>
+      <div class="warp-container" id="warp-container" aria-hidden="true"></div>
 
-      <section id="missionOverlay" class="mission-overlay" aria-live="polite" aria-hidden="true">
-        <div class="control-panel mission-popup" role="dialog" aria-labelledby="missionText">
-          <div>
-            <p id="missionText" class="mission-text">Landning klar.</p>
-            <div class="planet-fact-card">
-              <span id="popupPlanetIcon" class="popup-planet-icon" aria-hidden="true"></span>
-              <p id="planetFactText" class="planet-fact-text">Planeten väntar på dig.</p>
-            </div>
-            <p id="mathPromptText" class="math-prompt-text">Lös talet för att flyga vidare</p>
-            <p id="questionText" class="question-text">0 + 0 = ?</p>
+      <main class="content">
+        <h1 class="logo-title">RYMDAKADEMIN</h1>
+        <div class="logo-underline" aria-hidden="true"></div>
+
+        <h2 class="section-title pilot-heading">Välj din pilot</h2>
+
+        <div class="pilots" id="pilots"></div>
+
+        <div class="new-pilot-form" id="new-pilot-form">
+          <label for="new-pilot-name">Vad heter piloten?</label>
+          <input type="text" id="new-pilot-name" maxlength="12" placeholder="T.ex. Nova" autocomplete="off">
+          <div class="error-msg" id="new-pilot-error" role="alert" aria-live="polite"></div>
+          <div class="form-buttons">
+            <button type="button" class="btn-cancel" id="btn-cancel-pilot">Avbryt</button>
+            <button type="button" class="btn-save" id="btn-save-pilot">Spara</button>
           </div>
-          <button id="readAloudBtn" type="button" class="read-aloud-button" aria-label="Läs upp texten" hidden>
-            <span aria-hidden="true">🔊</span>
-            <span>Läs upp</span>
-          </button>
-          <div id="answers" class="answers"></div>
-          <p id="feedbackText" class="feedback">Lös talet för att flyga vidare.</p>
-          <p id="speechText" class="sr-only"></p>
         </div>
-      </section>
-    </main>
 
-    <script type="module" src="/js/app.js"></script>
+        <h2 class="section-title mission-heading">Välj uppdrag</h2>
+
+        <div class="missions" id="missions"></div>
+      </main>
+    </div>
+
+    <script type="module" src="/js/start/start.js"></script>
   </body>
 </html>
