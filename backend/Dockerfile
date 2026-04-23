@@ -8,7 +8,11 @@ RUN npm install --omit=dev
 COPY backend ./backend
 COPY frontend ./frontend
 
+RUN chown -R node:node /app
+
 WORKDIR /app/backend
+
+USER node
 
 EXPOSE 3000
 

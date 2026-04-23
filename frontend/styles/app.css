@@ -515,8 +515,8 @@ button:focus-visible,
 .planet.locked-home .planet-name::after {
   display: block;
   color: var(--muted);
-  font-size: 0.72rem;
-  content: "Låst";
+  font-size: 0.82rem;
+  content: "🔒 Kom sen";
 }
 
 .planet.unlocked-home:not(.current)::before {
@@ -989,6 +989,26 @@ button:focus-visible,
   min-width: min(100%, 360px);
   padding-inline: 24px;
   font-size: clamp(1.5rem, 3.8vw, 2.6rem);
+}
+
+.read-aloud-button {
+  justify-self: center;
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 52px;
+  padding: 8px 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(85, 255, 178, 0.56);
+  font-size: clamp(1rem, 1.8vw, 1.2rem);
+  font-weight: 900;
+  color: var(--ink);
+  background: linear-gradient(180deg, rgba(85, 255, 178, 0.28), rgba(39, 61, 136, 0.9));
+  box-shadow: 0 4px 0 #07152c, 0 0 16px rgba(85, 255, 178, 0.22);
+}
+
+.read-aloud-button[hidden] {
+  display: none;
 }
 
 .answer-button.correct {

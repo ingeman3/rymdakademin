@@ -1,7 +1,7 @@
 const path = require('path');
-const cors = require('cors');
 const express = require('express');
 const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const { query, pool } = require('./db');
@@ -47,16 +47,25 @@ app.use(
     crossOriginEmbedderPolicy: false,
   })
 );
-app.use(cors());
-app.use(express.json());
 app.use(express.static(frontendPath));
+
+app.use(
+  '/api',
+  rateLimit({
+    windowMs: 60_000,
+    max: 120,
+    standardHeaders: true,
+    legacyHeaders: false,
+  })
+);
 
 app.get('/api/health', async (_req, res) => {
   try {
     await query('SELECT 1');
-    res.json({ status: 'ok', app: 'Rymdakademin', database: 'connected' });
+    res.json({ status: 'ok' });
   } catch (error) {
-    res.status(500).json({ status: 'error', message: 'Databasen svarar inte.' });
+    console.error('Health check failed:', error);
+    res.status(500).json({ status: 'error' });
   }
 });
 
@@ -72,6 +81,10 @@ app.get('/api/games/:gameId', (req, res) => {
   }
 
   return res.json(game);
+});
+
+app.use('/api', (_req, res) => {
+  res.status(404).json({ message: 'Hittades inte.' });
 });
 
 app.get('*', (_req, res) => {

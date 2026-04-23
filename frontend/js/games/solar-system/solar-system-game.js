@@ -109,15 +109,12 @@ export function startSolarSystemGame() {
     render();
     ui.animateStarCollection(completedPlanet, state.completedPlanets.size, () => {
       state.visualStars = state.completedPlanets.size;
-    });
-
-    window.setTimeout(() => {
       ui.closeMissionPopup(() => {
         state.locked = false;
         state.selectedPlanet = null;
         render();
       });
-    }, 650);
+    });
   }
 
   function finishGame() {

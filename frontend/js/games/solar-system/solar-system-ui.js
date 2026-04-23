@@ -18,11 +18,31 @@ export function createSolarSystemUi(handlers) {
   const feedbackText = document.getElementById('feedbackText');
   const speechText = document.getElementById('speechText');
   const starsPanel = document.querySelector('.stars-panel');
+  const readAloudBtn = document.getElementById('readAloudBtn');
 
   let shipPosition = planetPoint(HOME_PLANET_INDEX);
   let animationFrame = null;
   const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
   const prefersReducedMotion = () => reducedMotionQuery.matches;
+  const speechSupported = typeof window !== 'undefined'
+    && 'speechSynthesis' in window
+    && typeof window.SpeechSynthesisUtterance === 'function';
+
+  if (readAloudBtn && speechSupported) {
+    readAloudBtn.hidden = false;
+    readAloudBtn.addEventListener('click', readAloud);
+  }
+
+  function readAloud() {
+    if (!speechSupported) return;
+    const text = speechText.textContent.trim();
+    if (!text) return;
+    window.speechSynthesis.cancel();
+    const utter = new window.SpeechSynthesisUtterance(text);
+    utter.lang = 'sv-SE';
+    utter.rate = 0.95;
+    window.speechSynthesis.speak(utter);
+  }
 
   function setupPlanets() {
     route.innerHTML = '';
@@ -38,16 +58,35 @@ export function createSolarSystemUi(handlers) {
       planet.style.left = `${point.x}%`;
       planet.style.top = `${point.y}%`;
       planet.title = planetData.name;
-      planet.innerHTML = `
-        <span class="planet-ring"></span>
-        <span class="planet-surface">
-          <span class="planet-detail"></span>
-          <span class="planet-number">${index + 1}</span>
-          <span class="planet-check">★</span>
-        </span>
-        <span class="here-label">Du är här</span>
-        <span class="planet-name">${planetData.name}</span>
-      `;
+
+      const ring = document.createElement('span');
+      ring.className = 'planet-ring';
+
+      const surface = document.createElement('span');
+      surface.className = 'planet-surface';
+
+      const detail = document.createElement('span');
+      detail.className = 'planet-detail';
+
+      const number = document.createElement('span');
+      number.className = 'planet-number';
+      number.textContent = String(index + 1);
+
+      const check = document.createElement('span');
+      check.className = 'planet-check';
+      check.textContent = '★';
+
+      surface.append(detail, number, check);
+
+      const hereLabel = document.createElement('span');
+      hereLabel.className = 'here-label';
+      hereLabel.textContent = 'Du är här';
+
+      const name = document.createElement('span');
+      name.className = 'planet-name';
+      name.textContent = planetData.name;
+
+      planet.append(ring, surface, hereLabel, name);
       planet.addEventListener('click', () => handlers.onPlanetSelected(index));
       route.appendChild(planet);
     });
@@ -94,11 +133,11 @@ export function createSolarSystemUi(handlers) {
   function showIntro(totalStars) {
     setPopupPlanet(HOME_PLANET_INDEX);
     missionText.textContent = 'Uppdrag från Jorden';
-    planetFactText.textContent = 'Besök alla andra planeter och lös deras matteuppdrag. När alla stjärnor är samlade får du återvända hem till Jorden.';
+    planetFactText.textContent = 'Flyg till alla planeter och lös ett mattetal på varje. Samla alla stjärnor. Kom sen hem till Jorden.';
     mathPromptText.textContent = 'Solsystemsresan';
-    questionText.textContent = `${totalStars} uppdrag väntar`;
-    feedbackText.textContent = 'Klicka på startknappen när du är redo, pilot.';
-    speechText.textContent = 'Uppdrag från Jorden. Besök alla andra planeter och lös deras matteuppdrag. När alla stjärnor är samlade får du återvända hem till Jorden.';
+    questionText.textContent = `${totalStars} planeter väntar`;
+    feedbackText.textContent = 'Tryck på knappen när du vill börja.';
+    speechText.textContent = 'Uppdrag från Jorden. Flyg till alla planeter och lös ett mattetal på varje. Samla alla stjärnor. Kom sen hem till Jorden.';
     controlPanel.classList.remove('success', 'correct-pulse', 'wrong-pulse');
     answers.innerHTML = '';
     answers.appendChild(createActionButton('Starta uppdraget', handlers.onMissionStarted));
@@ -322,6 +361,10 @@ export function createSolarSystemUi(handlers) {
   }
 
   function closeMissionPopup(onClosed) {
+    if (speechSupported) {
+      window.speechSynthesis.cancel();
+    }
+
     if (!missionOverlay.classList.contains('open')) {
       if (onClosed) {
         onClosed();
