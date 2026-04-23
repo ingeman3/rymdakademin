@@ -4,9 +4,9 @@ services:
     container_name: rymdakademin-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: rymdakademin
-      POSTGRES_USER: rymd_user
-      POSTGRES_PASSWORD: rymd_password
+      POSTGRES_DB: ${DB_NAME:?DB_NAME must be set (copy .env.example to .env)}
+      POSTGRES_USER: ${DB_USER:?DB_USER must be set (copy .env.example to .env)}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set (copy .env.example to .env)}
     ports:
       - "5433:5432"
     volumes:
@@ -29,9 +29,9 @@ services:
       PORT: 3000
       DB_HOST: db
       DB_PORT: 5432
-      DB_NAME: rymdakademin
-      DB_USER: rymd_user
-      DB_PASSWORD: rymd_password
+      DB_NAME: ${DB_NAME:?DB_NAME must be set}
+      DB_USER: ${DB_USER:?DB_USER must be set}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set}
     ports:
       - "3001:3000"
     depends_on:
