@@ -21,14 +21,6 @@ export const SCHEMA_VERSION = 1;
 const LEGACY_PILOTS_KEY = 'rymdakademin.pilots.v1';
 const LEGACY_SELECTED_KEY = 'rymdakademin.selectedPilot.v1';
 
-const DEFAULT_PILOTS = [
-  { id: 'harry',   name: 'Harry',   color: '#d85a30', icon: 'rocket' },
-  { id: 'ted',     name: 'Ted',     color: '#378add', icon: 'bolt' },
-  { id: 'noah',    name: 'Noah',    color: '#7f77dd', icon: 'smile' },
-  { id: 'theodor', name: 'Theodor', color: '#1d9e75', icon: 'user' },
-  { id: 'nova',    name: 'Nova',    color: '#d4537e', icon: 'star' },
-];
-
 // Pure rank lookup. Exported separately so it is independently
 // testable and reusable by UI layers that need the label without
 // loading the whole snapshot.
@@ -66,17 +58,6 @@ function freshPilot({ id, name, color, icon }) {
     lastPlayedAt: null,
     games: {},
   };
-}
-
-function seedDefaults(snapshot) {
-  DEFAULT_PILOTS.forEach((p) => {
-    if (!snapshot.pilots[p.id]) {
-      snapshot.pilots[p.id] = freshPilot(p);
-    }
-  });
-  if (!snapshot.selectedPilot) {
-    snapshot.selectedPilot = 'ted';
-  }
 }
 
 // Session-only in-memory fallback used when localStorage throws.
@@ -144,8 +125,9 @@ export function getSnapshot() {
     persist(migrated);
     return migrated;
   }
+  // No pre-seeded pilots — a fresh account lands on the empty-state
+  // onboarding card and creates their first pilot from there.
   const fresh = emptySnapshot();
-  seedDefaults(fresh);
   persist(fresh);
   return fresh;
 }
