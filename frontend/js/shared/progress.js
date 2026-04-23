@@ -21,14 +21,6 @@ export const SCHEMA_VERSION = 1;
 const LEGACY_PILOTS_KEY = 'rymdakademin.pilots.v1';
 const LEGACY_SELECTED_KEY = 'rymdakademin.selectedPilot.v1';
 
-const DEFAULT_PILOTS = [
-  { id: 'harry',   name: 'Harry',   color: '#d85a30', icon: 'rocket' },
-  { id: 'ted',     name: 'Ted',     color: '#378add', icon: 'bolt' },
-  { id: 'noah',    name: 'Noah',    color: '#7f77dd', icon: 'smile' },
-  { id: 'theodor', name: 'Theodor', color: '#1d9e75', icon: 'user' },
-  { id: 'nova',    name: 'Nova',    color: '#d4537e', icon: 'star' },
-];
-
 // Pure rank lookup. Exported separately so it is independently
 // testable and reusable by UI layers that need the label without
 // loading the whole snapshot.
@@ -68,17 +60,6 @@ function freshPilot({ id, name, color, icon }) {
   };
 }
 
-function seedDefaults(snapshot) {
-  DEFAULT_PILOTS.forEach((p) => {
-    if (!snapshot.pilots[p.id]) {
-      snapshot.pilots[p.id] = freshPilot(p);
-    }
-  });
-  if (!snapshot.selectedPilot) {
-    snapshot.selectedPilot = 'ted';
-  }
-}
-
 // Session-only in-memory fallback used when localStorage throws.
 let memorySnapshot = null;
 
@@ -104,7 +85,15 @@ function migrateFromPhase4() {
 
   const snap = emptySnapshot();
   for (const entry of legacyPilots) {
-    if (!entry || typeof entry.id !== 'string' || typeof entry.name !== 'string') continue;
+    // Must have id and name; both must be non-empty strings after
+    // trimming. Previously we relied on DEFAULT_PILOTS seeding to
+    // backfill any empty result, but with DEFAULT_PILOTS gone the
+    // migration is the only path for existing users — drop invalid
+    // entries silently so the empty-state UI appears rather than a
+    // corrupt pilot.
+    if (!entry) continue;
+    if (typeof entry.id !== 'string' || entry.id.trim().length === 0) continue;
+    if (typeof entry.name !== 'string' || entry.name.trim().length === 0) continue;
     snap.pilots[entry.id] = freshPilot({
       id: entry.id,
       name: entry.name,
@@ -144,8 +133,9 @@ export function getSnapshot() {
     persist(migrated);
     return migrated;
   }
+  // No pre-seeded pilots — a fresh account lands on the empty-state
+  // onboarding card and creates their first pilot from there.
   const fresh = emptySnapshot();
-  seedDefaults(fresh);
   persist(fresh);
   return fresh;
 }

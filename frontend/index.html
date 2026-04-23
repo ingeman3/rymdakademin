@@ -29,9 +29,11 @@
 
         <div class="pilots" id="pilots"></div>
 
+        <p id="pilot-empty-tagline" class="pilot-empty-tagline" hidden>Varje pilot har sin egen resa genom rymden.</p>
+
         <div class="new-pilot-form" id="new-pilot-form">
           <label for="new-pilot-name">Vad heter piloten?</label>
-          <input type="text" id="new-pilot-name" maxlength="12" placeholder="T.ex. Nova" autocomplete="off">
+          <input type="text" id="new-pilot-name" maxlength="12" placeholder="T.ex. Raket" autocomplete="off">
           <div class="error-msg" id="new-pilot-error" role="alert" aria-live="polite"></div>
           <div class="form-buttons">
             <button type="button" class="btn-cancel" id="btn-cancel-pilot">Avbryt</button>
@@ -39,9 +41,9 @@
           </div>
         </div>
 
-        <h2 class="section-title mission-heading">Välj uppdrag</h2>
+        <h2 id="mission-heading" class="section-title mission-heading" hidden>Välj uppdrag</h2>
 
-        <div class="missions" id="missions"></div>
+        <div class="missions" id="missions" hidden></div>
       </main>
     </div>
 

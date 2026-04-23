@@ -1,15 +1,9 @@
-// Default pilot line-up and the icon library used across the start
-// page. ICONS holds hardcoded SVG path fragments — never user input —
+// Icon library and constants shared by the start page.
+// ICONS holds hardcoded SVG path fragments — never user input —
 // so consumers may assign them via innerHTML (see iconSvg in start.js).
-// DEFAULT_PILOTS is the fallback roster when localStorage is empty.
-
-export const DEFAULT_PILOTS = [
-  { id: 'harry',   name: 'Harry',   color: '#d85a30', icon: 'rocket' },
-  { id: 'ted',     name: 'Ted',     color: '#378add', icon: 'bolt' },
-  { id: 'noah',    name: 'Noah',    color: '#7f77dd', icon: 'smile' },
-  { id: 'theodor', name: 'Theodor', color: '#1d9e75', icon: 'user' },
-  { id: 'nova',    name: 'Nova',    color: '#d4537e', icon: 'star' },
-];
+// There is no pre-seeded pilot roster: every account starts with an
+// empty pilots map and the user creates their own via the empty-state
+// onboarding card on the start page.
 
 export const NEW_PILOT_COLORS = [
   '#d85a30',
