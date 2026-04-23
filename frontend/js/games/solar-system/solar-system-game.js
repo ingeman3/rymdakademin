@@ -5,7 +5,8 @@ import {
   planetPoint,
 } from './solar-system-data.js';
 import { createSolarSystemUi } from './solar-system-ui.js';
-import { addStars, getSelectedPilotId } from '../../shared/progress.js';
+import { addStars, getSelectedPilot, getSelectedPilotId } from '../../shared/progress.js';
+import { showRankCelebration } from '../../shared/rank-celebration.js';
 
 const GAME_ID = 'solar-system';
 const STARS_PER_COMPLETION = 7;
@@ -128,12 +129,26 @@ export function startSolarSystemGame() {
     // Persist the session. Stars accumulate across replays — a 5-year-
     // old who plays five times deserves to see 35, not plateau at 7.
     const pilotId = getSelectedPilotId();
-    if (pilotId) {
-      addStars(pilotId, GAME_ID, STARS_PER_COMPLETION);
+    const result = pilotId
+      ? addStars(pilotId, GAME_ID, STARS_PER_COMPLETION)
+      : { rankChanged: false };
+
+    const proceed = () => {
+      ui.showFinish();
+      render();
+    };
+
+    if (result.rankChanged) {
+      // The rank label "lands" on screen before the welcome-home
+      // panel appears, so the child clearly registers "I am now
+      // Pilot" before being told "Välkommen hem, pilot".
+      const pilot = getSelectedPilot();
+      showRankCelebration({ rank: result.newRank, name: pilot && pilot.name })
+        .then(proceed);
+      return;
     }
 
-    ui.showFinish();
-    render();
+    proceed();
   }
 
   function allMissionsCompleted() {
