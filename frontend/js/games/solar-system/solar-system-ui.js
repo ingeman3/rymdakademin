@@ -21,6 +21,8 @@ export function createSolarSystemUi(handlers) {
 
   let shipPosition = planetPoint(HOME_PLANET_INDEX);
   let animationFrame = null;
+  const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const prefersReducedMotion = () => reducedMotionQuery.matches;
 
   function setupPlanets() {
     route.innerHTML = '';
@@ -168,6 +170,14 @@ export function createSolarSystemUi(handlers) {
   function flyToPlanet(destination, onArrival) {
     const start = { ...shipPosition };
     const end = planetPoint(destination);
+
+    if (prefersReducedMotion()) {
+      shipPosition = end;
+      setShipPosition(shipPosition, 0);
+      onArrival();
+      return;
+    }
+
     const startedAt = performance.now();
     const distance = Math.hypot(end.x - start.x, end.y - start.y);
     const duration = Math.min(1800, 1080 + distance * 18);
@@ -226,7 +236,7 @@ export function createSolarSystemUi(handlers) {
   function animateStarCollection(planetIndex, nextVisualStars, onCollected) {
     const planet = document.querySelector(`.planet[data-index="${planetIndex}"]`);
 
-    if (!planet || !starDisplay) {
+    if (!planet || !starDisplay || prefersReducedMotion()) {
       renderStars(nextVisualStars);
       pulseStarBar();
       if (onCollected) {
