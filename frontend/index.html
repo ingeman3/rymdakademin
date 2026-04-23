@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rymdakademin</title>
+    <link rel="stylesheet" href="/styles/app.css">
+    <link rel="stylesheet" href="/styles/start.css">
+  </head>
+  <body>
+    <div class="rymd-root" id="rymd-root">
+      <div class="nebula nebula-1" aria-hidden="true"></div>
+      <div class="nebula nebula-2" aria-hidden="true"></div>
+      <div class="nebula nebula-3" aria-hidden="true"></div>
+
+      <div class="starfield" aria-hidden="true">
+        <div class="stars-far"></div>
+        <div class="stars-mid"></div>
+        <div class="stars-near"></div>
+      </div>
+
+      <div class="warp-container" id="warp-container" aria-hidden="true"></div>
+
+      <main class="content">
+        <h1 class="logo-title">RYMDAKADEMIN</h1>
+        <div class="logo-underline" aria-hidden="true"></div>
+
+        <h2 class="section-title pilot-heading">Välj din pilot</h2>
+
+        <div class="pilots" id="pilots"></div>
+
+        <div class="new-pilot-form" id="new-pilot-form">
+          <label for="new-pilot-name">Vad heter piloten?</label>
+          <input type="text" id="new-pilot-name" maxlength="12" placeholder="T.ex. Nova" autocomplete="off">
+          <div class="error-msg" id="new-pilot-error" role="alert" aria-live="polite"></div>
+          <div class="form-buttons">
+            <button type="button" class="btn-cancel" id="btn-cancel-pilot">Avbryt</button>
+            <button type="button" class="btn-save" id="btn-save-pilot">Spara</button>
+          </div>
+        </div>
+
+        <h2 class="section-title mission-heading">Välj uppdrag</h2>
+
+        <div class="missions" id="missions"></div>
+      </main>
+    </div>
+
+    <script type="module" src="/js/start/start.js"></script>
+  </body>
+</html>

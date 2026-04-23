@@ -1,0 +1,480 @@
+/* Start-page styles. Loaded after app.css which provides the
+   universal reset, focus ring, sr-only, and reduced-motion fallback.
+   Visual language is locked to the approved prototype — do not adjust
+   colors, sizes, or animation timings without re-review. */
+
+body {
+  background: #000;
+  color: #fff;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.rymd-root {
+  position: relative;
+  min-height: 100vh;
+  background: #000;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Parallax starfield (three layers). */
+.starfield {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.stars-far, .stars-mid, .stars-near {
+  position: absolute;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+}
+.stars-far {
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1px 1px at 30% 50%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 50% 80%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1px 1px at 70% 30%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 85% 60%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 15% 75%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1px 1px at 45% 15%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 65% 85%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 90% 10%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1px 1px at 5% 45%, rgba(255,255,255,0.5), transparent);
+  background-size: 100% 100%;
+  animation: twinkleFar 8s ease-in-out infinite alternate, driftFar 120s linear infinite;
+}
+.stars-mid {
+  background-image:
+    radial-gradient(1.5px 1.5px at 20% 30%, rgba(180,220,255,0.9), transparent),
+    radial-gradient(1.5px 1.5px at 60% 70%, rgba(255,220,200,0.8), transparent),
+    radial-gradient(1.5px 1.5px at 80% 20%, rgba(200,230,255,0.9), transparent),
+    radial-gradient(1.5px 1.5px at 35% 85%, rgba(255,255,255,0.8), transparent),
+    radial-gradient(1.5px 1.5px at 75% 45%, rgba(230,200,255,0.7), transparent);
+  background-size: 100% 100%;
+  animation: twinkleMid 5s ease-in-out infinite alternate, driftMid 80s linear infinite;
+}
+.stars-near {
+  background-image:
+    radial-gradient(2px 2px at 25% 40%, rgba(101,247,255,0.9), transparent),
+    radial-gradient(2px 2px at 70% 60%, rgba(255,209,102,0.8), transparent),
+    radial-gradient(2px 2px at 50% 25%, rgba(255,255,255,1), transparent);
+  background-size: 100% 100%;
+  animation: twinkleNear 3s ease-in-out infinite alternate, driftNear 50s linear infinite;
+}
+
+@keyframes twinkleFar {
+  0% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+@keyframes twinkleMid {
+  0% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+@keyframes twinkleNear {
+  0% { opacity: 0.7; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1.1); }
+}
+@keyframes driftFar {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-5%, 3%); }
+}
+@keyframes driftMid {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-8%, -5%); }
+}
+@keyframes driftNear {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-12%, 8%); }
+}
+
+/* Warp streaks — 25 streaks at 2.5-4 s each, medium thickness. */
+.warp-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.warp-streak {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1.5px;
+  height: 50px;
+  background: linear-gradient(to bottom, transparent, rgba(101,247,255,0.55), transparent);
+  transform-origin: center top;
+  opacity: 0;
+  animation: warpZoom 3s linear infinite;
+}
+
+@keyframes warpZoom {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateY(0) scaleY(0.25);
+  }
+  22% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateY(800px) scaleY(1.2);
+  }
+}
+
+.nebula {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.35;
+  pointer-events: none;
+  animation: nebulaSpin 60s linear infinite;
+}
+.nebula-1 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, #6b2fb3 0%, #4a1a8a 40%, transparent 70%);
+  top: -100px;
+  left: -100px;
+}
+.nebula-2 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, #2d5fa8 0%, #1a3a7a 40%, transparent 70%);
+  bottom: -50px;
+  right: -80px;
+  animation-duration: 80s;
+  animation-direction: reverse;
+}
+.nebula-3 {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, #a83d7a 0%, #6a1a4f 40%, transparent 70%);
+  top: 40%;
+  left: 60%;
+  animation-duration: 100s;
+  opacity: 0.25;
+}
+
+@keyframes nebulaSpin {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+.content {
+  position: relative;
+  z-index: 10;
+  padding: 60px 40px 80px;
+  text-align: center;
+}
+
+.logo-title {
+  font-size: clamp(40px, 6vw, 64px);
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  background: linear-gradient(180deg, #65f7ff 0%, #3a8fcc 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 40px rgba(101,247,255,0.5);
+  margin: 0 0 8px;
+  filter: drop-shadow(0 0 20px rgba(101,247,255,0.4));
+}
+.logo-underline {
+  width: 200px;
+  height: 3px;
+  margin: 0 auto 40px;
+  background: linear-gradient(90deg, transparent, #9d4edd, transparent);
+  border-radius: 2px;
+}
+
+.section-title {
+  font-size: clamp(20px, 2.4vw, 28px);
+  font-weight: 700;
+  margin: 0 0 28px;
+}
+.section-title.pilot-heading {
+  background: linear-gradient(180deg, #65f7ff 0%, #9d4edd 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.section-title.mission-heading {
+  background: linear-gradient(180deg, #ff4eb8 0%, #9d4edd 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-top: 60px;
+}
+
+.pilots {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.pilot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 16px;
+  transition: transform 0.2s ease;
+  color: inherit;
+  font: inherit;
+}
+.pilot:hover {
+  transform: translateY(-4px);
+}
+
+.pilot-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid rgba(255,255,255,0.15);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+.pilot.selected .pilot-avatar {
+  border-color: #65f7ff;
+  box-shadow: 0 0 0 4px rgba(101,247,255,0.2), 0 0 30px rgba(101,247,255,0.6);
+  transform: scale(1.08);
+}
+
+.pilot-avatar svg {
+  width: 36px;
+  height: 36px;
+  stroke: #fff;
+  stroke-width: 2;
+  fill: none;
+}
+
+.pilot-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.65);
+  transition: color 0.2s ease;
+}
+.pilot.selected .pilot-name {
+  color: #fff;
+}
+
+.pilot-new .pilot-avatar {
+  background: transparent;
+  border: 2px dashed rgba(255,255,255,0.25);
+}
+.pilot-new .pilot-avatar svg {
+  stroke: rgba(255,255,255,0.5);
+}
+
+.missions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 260px));
+  gap: 20px;
+  justify-content: center;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.mission-card {
+  position: relative;
+  background: rgba(12, 22, 52, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 120px;
+  color: inherit;
+  font: inherit;
+}
+.mission-card.active {
+  border: 2px solid #65f7ff;
+  box-shadow: 0 0 30px rgba(101,247,255,0.3);
+  cursor: pointer;
+}
+.mission-card.active:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 40px rgba(101,247,255,0.4);
+}
+.mission-card.locked {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.mission-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mission-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mission-icon.bg-blue {
+  background: linear-gradient(135deg, #4a9eff, #2d6fd1);
+}
+.mission-icon.bg-gray {
+  background: rgba(255,255,255,0.08);
+}
+.mission-icon svg {
+  width: 26px;
+  height: 26px;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 2;
+}
+
+.mission-play {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #2ecc71;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(46,204,113,0.5);
+}
+.mission-play svg {
+  width: 18px;
+  height: 18px;
+  fill: #fff;
+  margin-left: 2px;
+}
+
+.mission-lock {
+  width: 28px;
+  height: 28px;
+  opacity: 0.4;
+}
+.mission-lock svg {
+  width: 100%;
+  height: 100%;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 2;
+}
+
+.mission-name {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+  color: #fff;
+}
+.mission-card.locked .mission-name {
+  color: rgba(255,255,255,0.5);
+}
+
+.mission-status {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.4);
+  margin-top: 4px;
+}
+
+.new-pilot-form {
+  display: none;
+  margin: 20px auto 0;
+  max-width: 320px;
+  background: rgba(12, 22, 52, 0.9);
+  border: 1px solid rgba(101,247,255,0.3);
+  border-radius: 12px;
+  padding: 20px;
+}
+.new-pilot-form.open {
+  display: block;
+}
+.new-pilot-form label {
+  display: block;
+  font-size: 13px;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 8px;
+  text-align: left;
+}
+.new-pilot-form input {
+  width: 100%;
+  padding: 10px 12px;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+.new-pilot-form input:focus {
+  outline: none;
+  border-color: #65f7ff;
+}
+.new-pilot-form input:focus-visible {
+  outline: 3px solid var(--amber);
+  outline-offset: 2px;
+}
+.new-pilot-form .form-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.new-pilot-form button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  min-height: 40px;
+  font-family: inherit;
+}
+.new-pilot-form .btn-save {
+  background: #65f7ff;
+  color: #0c1634;
+}
+.new-pilot-form .btn-cancel {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+.new-pilot-form .error-msg {
+  color: #ff6b6b;
+  font-size: 12px;
+  margin-top: 6px;
+  min-height: 16px;
+}
+
+/* Stop the ambient motion the moment the user asks for it. */
+@media (prefers-reduced-motion: reduce) {
+  .stars-far,
+  .stars-mid,
+  .stars-near,
+  .warp-streak,
+  .nebula {
+    animation: none !important;
+  }
+  .warp-streak {
+    opacity: 0;
+  }
+  .pilot:hover,
+  .mission-card.active:hover {
+    transform: none;
+  }
+}
