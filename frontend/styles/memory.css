@@ -1,0 +1,278 @@
+/* Rymdminnet game styles. Loaded after app.css (shared reset/focus)
+   and game-shell.css (the header component). */
+
+body {
+  background:
+    radial-gradient(circle at 18% 20%, rgba(101, 247, 255, 0.16), transparent 26%),
+    radial-gradient(circle at 82% 70%, rgba(255, 79, 163, 0.12), transparent 26%),
+    linear-gradient(135deg, #060a1f, #111a3d 58%, #190f36);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  overflow-x: hidden;
+}
+
+.memory-page {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: clamp(16px, 2.6vw, 26px);
+  min-height: 100vh;
+  padding: clamp(16px, 3vw, 34px);
+}
+
+.memory-stage {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: clamp(12px, 2vw, 24px);
+}
+
+/* 4x4 grid of cards, centred and capped at a comfortable max width. */
+.memory-board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(8px, 1.8vw, 16px);
+  width: 100%;
+  max-width: 680px;
+}
+
+.memory-board.locked .memory-card {
+  pointer-events: none;
+  cursor: default;
+}
+
+/* A single card — real <button> for keyboard focus + phase 1 amber
+   ring. Perspective is on the outer button so the inner face flip
+   reads as a proper 3D rotation. */
+.memory-card {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  perspective: 800px;
+  cursor: pointer;
+  touch-action: manipulation;
+  font: inherit;
+}
+
+.memory-card:disabled {
+  cursor: default;
+}
+
+.memory-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+  border-radius: 14px;
+}
+
+.memory-card.revealed .memory-card-inner,
+.memory-card.matched .memory-card-inner {
+  transform: rotateY(180deg);
+}
+
+.memory-card-face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow: hidden;
+}
+
+.memory-card-back {
+  background:
+    radial-gradient(circle at 35% 30%, rgba(101, 247, 255, 0.18), transparent 60%),
+    linear-gradient(160deg, #273d88 0%, #111a3d 100%);
+  border: 2px solid rgba(101, 247, 255, 0.24);
+  color: rgba(101, 247, 255, 0.55);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 900;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.42), inset 0 0 22px rgba(101, 247, 255, 0.08);
+}
+
+.memory-card-front {
+  transform: rotateY(180deg);
+  background: #0c1634;
+  border: 2px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.42);
+  padding: 12%;
+}
+
+.memory-card-front svg {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* Matched cards get a persistent soft cyan glow. */
+.memory-card.matched .memory-card-front {
+  border-color: rgba(85, 255, 178, 0.75);
+  box-shadow: 0 0 0 2px rgba(85, 255, 178, 0.25), 0 6px 22px rgba(0, 0, 0, 0.35), 0 0 24px rgba(85, 255, 178, 0.32);
+}
+
+/* Mismatch blink — card tints red briefly. Triggered by adding
+   .mismatch; class is cleared by the UI after MISMATCH_HIDE_MS. */
+.memory-card.mismatch .memory-card-front {
+  animation: memoryMismatchBlink 600ms ease;
+  border-color: rgba(224, 75, 75, 0.7);
+}
+
+@keyframes memoryMismatchBlink {
+  0%, 100% { box-shadow: 0 6px 22px rgba(0, 0, 0, 0.42); }
+  30%, 70% {
+    box-shadow: 0 0 0 4px rgba(224, 75, 75, 0.45), 0 6px 22px rgba(0, 0, 0, 0.42), 0 0 18px rgba(224, 75, 75, 0.5);
+  }
+}
+
+/* Match pulse: briefly grows the whole card so the match feels
+   rewarding. */
+.memory-card.match-pulse {
+  animation: memoryMatchPulse 400ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes memoryMatchPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* Peek state — cards face-up during the initial reveal for beginner
+   ranks. The .peek class layers cosmetic hints (subtle opacity pulse)
+   on top of .revealed so kids understand the window is temporary. */
+.memory-card.peek .memory-card-front {
+  animation: memoryPeekPulse 2s ease-in-out infinite;
+}
+
+@keyframes memoryPeekPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.82; }
+}
+
+/* Flying star (match reward) matches solar-system's flying-reward-star
+   spec: fixed positioning, high z-index, big amber glow. */
+.memory-flying-star {
+  position: fixed;
+  z-index: 45;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  color: var(--amber, #ffd166);
+  font-size: 2.4rem;
+  line-height: 1;
+  text-shadow:
+    0 0 10px rgba(255, 244, 166, 0.95),
+    0 0 24px rgba(255, 209, 102, 0.72),
+    0 0 44px rgba(85, 255, 178, 0.34);
+  pointer-events: none;
+  filter: drop-shadow(0 0 10px rgba(255, 209, 102, 0.54));
+}
+
+/* Completion screen — dark glass panel centred over the board. */
+.memory-completion {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: clamp(18px, 4vw, 40px);
+  background:
+    radial-gradient(circle at 50% 45%, rgba(101, 247, 255, 0.12), transparent 28%),
+    rgba(1, 5, 18, 0.68);
+  backdrop-filter: blur(10px);
+}
+
+.memory-completion[hidden] {
+  display: none;
+}
+
+.memory-completion-title {
+  margin: 0 0 16px;
+  color: var(--ink, #f8fbff);
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  font-weight: 900;
+  text-align: center;
+  text-shadow: 0 0 24px rgba(101, 247, 255, 0.45);
+}
+
+.memory-completion-stars {
+  margin: 0 0 8px;
+  color: var(--amber, #ffd166);
+  font-size: clamp(2rem, 6vw, 3.4rem);
+  letter-spacing: 0.1em;
+  text-align: center;
+  text-shadow: 0 0 20px rgba(255, 209, 102, 0.6);
+}
+
+.memory-completion-stats {
+  margin: 0 0 24px;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  font-weight: 600;
+  text-align: center;
+}
+
+.memory-completion-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.memory-action {
+  min-height: 56px;
+  padding: 14px 22px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: var(--ink, #f8fbff);
+  font: inherit;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  font-weight: 800;
+  cursor: pointer;
+  touch-action: manipulation;
+  background: rgba(12, 22, 52, 0.65);
+}
+
+.memory-action.primary {
+  border-color: rgba(85, 255, 178, 0.66);
+  background: linear-gradient(180deg, rgba(85, 255, 178, 0.42), rgba(23, 129, 100, 0.95));
+  box-shadow: 0 0 26px rgba(85, 255, 178, 0.4), 0 6px 0 #064b3b;
+}
+
+.memory-action.secondary {
+  border-color: rgba(101, 247, 255, 0.42);
+  background: rgba(2, 8, 24, 0.65);
+}
+
+/* Reduced-motion: collapse all memory animations immediately. The
+   universal 0.001 ms rule from app.css covers most of this; the
+   explicit overrides below cover the named keyframe animations. */
+@media (prefers-reduced-motion: reduce) {
+  .memory-card-inner,
+  .memory-card.mismatch .memory-card-front,
+  .memory-card.match-pulse,
+  .memory-card.peek .memory-card-front {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Small screens: tighter gaps, keep touch targets ≥ 44 px. */
+@media (max-width: 500px) {
+  .memory-board {
+    gap: 8px;
+  }
+  .memory-card-back {
+    font-size: 1.6rem;
+  }
+}

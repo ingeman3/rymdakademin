@@ -11,7 +11,7 @@ import {
 
 const MISSIONS = [
   { id: 'solar',   name: 'Solsystemsresan', status: 'active', icon: 'globe', bgColor: 'bg-blue', href: '/solsystemsresan' },
-  { id: 'minne',   name: 'Rymdminnet',      status: 'locked', icon: 'brain', bgColor: 'bg-gray' },
+  { id: 'minne',   name: 'Rymdminnet',      status: 'active', icon: 'brain', bgColor: 'bg-gray', href: '/rymdminnet' },
   { id: 'bokstav', name: 'Bokstavsjakten',  status: 'locked', icon: 'abc',   bgColor: 'bg-gray' },
 ];
 
