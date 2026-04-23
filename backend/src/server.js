@@ -220,6 +220,24 @@ app.get('/api/progress', requireEmail, async (req, res) => {
   }
 });
 
+app.delete('/api/progress', requireEmail, progressWriteLimiter, async (req, res) => {
+  try {
+    const result = await query(
+      'DELETE FROM progress_snapshots WHERE account_email = $1',
+      [req.email]
+    );
+    // 200 whether a row existed or not — DELETE is idempotent from the
+    // caller's perspective. rowCount is returned so a UI can
+    // distinguish "your data is gone" from "there was nothing to
+    // delete" if it cares.
+    return res.json({ ok: true, deleted: result.rowCount });
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error('DELETE /api/progress failed:', err);
+    return res.status(500).json({ ok: false, message: 'Serverfel.' });
+  }
+});
+
 app.put('/api/progress', requireEmail, progressWriteLimiter, jsonParser, async (req, res) => {
   const body = req.body;
   if (!body || typeof body !== 'object' || Array.isArray(body)) {
