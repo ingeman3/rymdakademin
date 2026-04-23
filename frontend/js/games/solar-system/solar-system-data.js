@@ -66,9 +66,15 @@ export const MISSION_PLANET_INDEXES = PLANETS
   .filter((index) => index !== HOME_PLANET_INDEX);
 
 export function planetPoint(index) {
+  const narrow = typeof window !== 'undefined'
+    && window.matchMedia('(max-width: 820px), (orientation: portrait)').matches;
+  const offset = narrow ? 10 : 12.5;
+  const spread = narrow ? 84 : 80;
+  const wobble = narrow ? 9 : 7;
+
   return {
-    x: 12.5 + index * (80 / LAST_PLANET_INDEX),
-    y: 50 + Math.sin(index * 0.92) * 7,
+    x: offset + index * (spread / LAST_PLANET_INDEX),
+    y: 50 + Math.sin(index * 0.92) * wobble,
   };
 }
 

@@ -1236,11 +1236,30 @@ button:focus-visible,
   }
 
   .space-map {
-    min-height: 310px;
+    min-height: 360px;
   }
 
   .planet {
-    width: calc(var(--planet-size) * 0.74);
+    width: clamp(44px, 12vw, calc(var(--planet-size) * 0.55));
+  }
+
+  .planet-name {
+    top: calc(100% + 6px);
+    font-size: clamp(0.68rem, 2.8vw, 0.82rem);
+  }
+
+  .sun {
+    left: -70px;
+    width: clamp(96px, 13vw, 150px);
+  }
+}
+
+@media (max-width: 500px) {
+  /* Names crowd each other when planets are tiny — hide by default,
+     keep the "Du är här" bubble and the number-in-planet for navigation.
+     The landing planet's full name is shown in the mission popup. */
+  .planet:not(.current):not(.unlocked-home) .planet-name {
+    display: none;
   }
 
   .ship {
