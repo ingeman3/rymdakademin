@@ -9,10 +9,19 @@
 // minimal playable loop: shuffle → click pairs → detect win → log.
 
 import { createGameShell } from '../../shared/game-shell.js';
-import { enableServerSync, getSelectedPilot, getSelectedPilotId } from '../../shared/progress.js';
+import {
+  addStars,
+  enableServerSync,
+  getSelectedPilot,
+  getSelectedPilotId,
+  setGameProgress,
+} from '../../shared/progress.js';
+import { showRankCelebration } from '../../shared/rank-celebration.js';
 import { createMemoryGame } from './memory-game.js';
 import { createMemoryUi } from './memory-ui.js';
 import { getMotifById } from './memory-data.js';
+
+const GAME_ID = 'memory';
 
 // Ranks that trigger the 4-second peek at game start. Higher ranks
 // have earned their way past the training wheels.
@@ -56,14 +65,45 @@ const game = createMemoryGame({
     // toggled state.cards[i].revealed back to false by then.
     setTimeout(() => ui.hideCards([a, b]), 900);
   },
-  onWin: (result) => {
-    // eslint-disable-next-line no-console
-    console.log('memory: won in', result.moves, 'moves,', result.starsEarned, 'stars');
-    // The polished completion screen + progress.addStars land in the
-    // following commits. For now, surface the result so a developer
-    // can see the game loop is working end-to-end.
-  },
+  onWin: (result) => handleWin(result),
 });
+
+async function handleWin(result) {
+  const pilotId = getSelectedPilotId();
+  const pilot = getSelectedPilot();
+
+  let rankChanged = false;
+  let newRank = pilot && pilot.rank;
+
+  if (pilotId) {
+    // Persist the per-game stats first (bestMoves must compare
+    // against the previous value BEFORE addStars overwrites the
+    // games.memory entry via its own merge).
+    const prev = pilot && pilot.games && pilot.games[GAME_ID];
+    const prevBestMoves = prev && Number.isFinite(prev.bestMoves) ? prev.bestMoves : null;
+    const bestMoves = prevBestMoves === null ? result.moves : Math.min(prevBestMoves, result.moves);
+
+    const addResult = addStars(pilotId, GAME_ID, result.starsEarned);
+    rankChanged = addResult.rankChanged;
+    newRank = addResult.newRank;
+
+    setGameProgress(pilotId, GAME_ID, { bestMoves });
+  }
+
+  const afterCelebration = () => {
+    ui.showCompletion({
+      moves: result.moves,
+      starsEarned: result.starsEarned,
+      onReplayClick: () => { startGame(); },
+      onBackClick: () => { window.location.href = '/'; },
+    });
+  };
+
+  if (rankChanged && newRank) {
+    await showRankCelebration({ rank: newRank, name: pilot && pilot.name });
+  }
+  afterCelebration();
+}
 
 async function startGame() {
   ui.hideCompletion();
