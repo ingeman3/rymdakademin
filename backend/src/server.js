@@ -87,8 +87,11 @@ app.use('/api', (_req, res) => {
   res.status(404).json({ message: 'Hittades inte.' });
 });
 
+// Temporary: until the start page lands the catch-all serves the game
+// HTML directly. Commit "feat: add Express route for /solsystemsresan"
+// restores the catch-all to index.html once a real start page exists.
 app.get('*', (_req, res) => {
-  res.sendFile(path.join(frontendPath, 'index.html'));
+  res.sendFile(path.join(frontendPath, 'solsystemsresan.html'));
 });
 
 const server = app.listen(port, () => {
