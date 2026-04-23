@@ -1,0 +1,51 @@
+version: 2
+updates:
+  # Backend npm dependencies. Groups all non-major bumps into one weekly PR
+  # to keep the review queue manageable; major bumps get their own PR each
+  # so breaking changes are reviewed in isolation.
+  - package-ecosystem: "npm"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    target-branch: "main"
+    labels:
+      - "dependencies"
+      - "security"
+    commit-message:
+      prefix: "deps"
+    groups:
+      backend-minor-patch:
+        applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Base image for the Express container. Monthly is plenty — node:20-alpine
+  # moves infrequently and security patches come in at image rebuild time too.
+  - package-ecosystem: "docker"
+    directory: "/backend"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 5
+    target-branch: "main"
+    labels:
+      - "dependencies"
+      - "security"
+    commit-message:
+      prefix: "docker"
+
+  # GitHub Actions ecosystem. No workflows exist yet; this entry activates
+  # the moment we add one under .github/workflows/, without requiring a
+  # follow-up config change.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 5
+    target-branch: "main"
+    labels:
+      - "dependencies"
+      - "security"
+    commit-message:
+      prefix: "ci"
