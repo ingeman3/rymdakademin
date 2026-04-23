@@ -286,6 +286,10 @@ app.get('/solsystemsresan', (_req, res) => {
   res.sendFile(path.join(frontendPath, 'solsystemsresan.html'));
 });
 
+app.get('/rymdminnet', (_req, res) => {
+  res.sendFile(path.join(frontendPath, 'rymdminnet.html'));
+});
+
 // Any other path falls through to the start page. Keeps deep links and
 // typos landing somewhere sensible instead of showing the game chrome.
 app.get('*', (_req, res) => {

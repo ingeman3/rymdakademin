@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rymdakademin - Rymdminnet</title>
+    <link rel="stylesheet" href="/styles/app.css">
+    <link rel="stylesheet" href="/styles/game-shell.css">
+    <link rel="stylesheet" href="/styles/memory.css">
+  </head>
+  <body>
+    <main class="memory-page" data-game="memory">
+      <section class="memory-stage" aria-label="Rymdminnet spelplan">
+        <div id="memory-board" class="memory-board" role="grid" aria-label="16 memorykort"></div>
+      </section>
+
+      <section id="memory-completion" class="memory-completion" aria-live="polite" aria-hidden="true" hidden></section>
+    </main>
+
+    <script type="module" src="/js/games/memory/memory-app.js"></script>
+  </body>
+</html>
