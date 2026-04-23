@@ -38,16 +38,35 @@ export function createSolarSystemUi(handlers) {
       planet.style.left = `${point.x}%`;
       planet.style.top = `${point.y}%`;
       planet.title = planetData.name;
-      planet.innerHTML = `
-        <span class="planet-ring"></span>
-        <span class="planet-surface">
-          <span class="planet-detail"></span>
-          <span class="planet-number">${index + 1}</span>
-          <span class="planet-check">★</span>
-        </span>
-        <span class="here-label">Du är här</span>
-        <span class="planet-name">${planetData.name}</span>
-      `;
+
+      const ring = document.createElement('span');
+      ring.className = 'planet-ring';
+
+      const surface = document.createElement('span');
+      surface.className = 'planet-surface';
+
+      const detail = document.createElement('span');
+      detail.className = 'planet-detail';
+
+      const number = document.createElement('span');
+      number.className = 'planet-number';
+      number.textContent = String(index + 1);
+
+      const check = document.createElement('span');
+      check.className = 'planet-check';
+      check.textContent = '★';
+
+      surface.append(detail, number, check);
+
+      const hereLabel = document.createElement('span');
+      hereLabel.className = 'here-label';
+      hereLabel.textContent = 'Du är här';
+
+      const name = document.createElement('span');
+      name.className = 'planet-name';
+      name.textContent = planetData.name;
+
+      planet.append(ring, surface, hereLabel, name);
       planet.addEventListener('click', () => handlers.onPlanetSelected(index));
       route.appendChild(planet);
     });
