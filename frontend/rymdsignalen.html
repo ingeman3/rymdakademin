@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rymdakademin - Rymdsignalen</title>
+    <link rel="stylesheet" href="/styles/app.css">
+    <link rel="stylesheet" href="/styles/game-shell.css">
+    <link rel="stylesheet" href="/styles/signal.css">
+  </head>
+  <body>
+    <div class="signal-background" aria-hidden="true">
+      <div class="signal-stars-far"></div>
+      <div class="signal-stars-mid"></div>
+      <div class="signal-stars-near"></div>
+      <svg class="signal-asteroid signal-asteroid-1" viewBox="0 0 64 40" aria-hidden="true">
+        <ellipse cx="32" cy="20" rx="30" ry="16" fill="#5a5f78" opacity="0.7"/>
+        <ellipse cx="22" cy="14" rx="5" ry="3"  fill="#2b2f40" opacity="0.75"/>
+        <ellipse cx="42" cy="24" rx="6" ry="4"  fill="#2b2f40" opacity="0.6"/>
+      </svg>
+      <svg class="signal-asteroid signal-asteroid-2" viewBox="0 0 48 30" aria-hidden="true">
+        <ellipse cx="24" cy="15" rx="22" ry="12" fill="#4a4f64" opacity="0.65"/>
+        <ellipse cx="16" cy="11" rx="3" ry="2"   fill="#22263a" opacity="0.6"/>
+      </svg>
+      <svg class="signal-asteroid signal-asteroid-3" viewBox="0 0 36 24" aria-hidden="true">
+        <ellipse cx="18" cy="12" rx="16" ry="9"  fill="#3e4259" opacity="0.6"/>
+      </svg>
+    </div>
+
+    <main class="signal-page" data-game="signal">
+      <section class="signal-stage" aria-label="Meddelandepanel">
+        <div id="signal-message" class="signal-message" role="group" aria-live="polite"></div>
+      </section>
+
+      <section class="signal-letters" id="signal-letters" aria-label="Bokstäver"></section>
+
+      <section id="signal-completion" class="signal-completion" aria-live="polite" aria-hidden="true" hidden></section>
+    </main>
+
+    <script type="module" src="/js/games/signal/signal-app.js"></script>
+  </body>
+</html>

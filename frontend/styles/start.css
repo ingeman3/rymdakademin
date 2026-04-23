@@ -342,6 +342,9 @@ body {
 .mission-icon.bg-blue {
   background: linear-gradient(135deg, #4a9eff, #2d6fd1);
 }
+.mission-icon.bg-purple {
+  background: linear-gradient(135deg, #c58dff, #6a3aa8);
+}
 .mission-icon.bg-gray {
   background: rgba(255,255,255,0.08);
 }

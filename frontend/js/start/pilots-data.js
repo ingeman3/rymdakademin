@@ -33,6 +33,7 @@ export const ICONS = {
   abc:    '<path d="M4 18V9a3 3 0 0 1 6 0v9M4 13h6"/><path d="M14 18V9h3a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-3M14 13h3a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-3"/>',
   lock:   '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
   play:   '<polygon points="6 4 20 12 6 20 6 4" stroke="none"/>',
+  radio:  '<path d="M4.5 10a10 10 0 0 1 15 0"/><path d="M7 13a6 6 0 0 1 10 0"/><circle cx="12" cy="17" r="2"/><line x1="12" y1="3" x2="12" y2="9"/>',
 };
 
 export const STORAGE_KEYS = {
