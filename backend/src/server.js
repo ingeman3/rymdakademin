@@ -1,6 +1,7 @@
 const path = require('path');
 const cors = require('cors');
 const express = require('express');
+const helmet = require('helmet');
 require('dotenv').config();
 
 const { query } = require('./db');
@@ -23,6 +24,26 @@ const games = [
   { id: 'number-station', name: 'Sifferstationen', status: 'planned' },
 ];
 
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: false,
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'"],
+        imgSrc: ["'self'", 'data:'],
+        connectSrc: ["'self'"],
+        fontSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        baseUri: ["'self'"],
+        formAction: ["'self'"],
+        frameAncestors: ["'none'"],
+      },
+    },
+    crossOriginEmbedderPolicy: false,
+  })
+);
 app.use(cors());
 app.use(express.json());
 app.use(express.static(frontendPath));
