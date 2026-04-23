@@ -30,6 +30,7 @@ const GAME_ID = 'signal';
 let sessionStartPlayCount = 0;
 
 const pageRoot = document.querySelector('.signal-page');
+const iconEl = document.getElementById('signal-icon');
 const messagePanelEl = document.getElementById('signal-message');
 const letterPanelEl = document.getElementById('signal-letters');
 const completionEl = document.getElementById('signal-completion');
@@ -41,6 +42,7 @@ if (pageRoot) {
 enableServerSync();
 
 const ui = createSignalUi({
+  iconEl,
   messagePanelEl,
   letterPanelEl,
   completionEl,

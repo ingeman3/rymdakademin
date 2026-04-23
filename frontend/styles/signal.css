@@ -15,10 +15,23 @@ body {
   position: relative;
   z-index: 1;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto 1fr auto;
   gap: clamp(16px, 2.4vw, 24px);
   min-height: 100vh;
   padding: clamp(16px, 3vw, 34px);
+}
+
+/* Stage is itself a grid parent for icon + message. The minmax(0,1fr)
+   here lets the letters grid below wrap at narrow widths without the
+   intrinsic minimum of 16 buttons × 44 px pushing the page wider than
+   the viewport. */
+.signal-stage {
+  min-width: 0;
+}
+
+.signal-letters {
+  min-width: 0;
 }
 
 /* Decorative background — drifts behind the cockpit message panel
@@ -149,7 +162,37 @@ body {
   position: relative;
   display: grid;
   place-items: center;
+  gap: clamp(14px, 2.2vw, 22px);
   padding: clamp(12px, 3vw, 28px);
+}
+
+/* Icon above the cockpit message panel. Purely decorative
+   (aria-hidden) — communicates what the word represents so a
+   pre-reader can solve the puzzle with visual context. */
+.signal-icon {
+  display: grid;
+  place-items: center;
+  width: clamp(80px, 12vw, 110px);
+  height: clamp(80px, 12vw, 110px);
+  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.45))
+          drop-shadow(0 0 10px rgba(101, 247, 255, 0.18));
+}
+
+.signal-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* 200 ms fade-in on every message swap. Skipped under
+   prefers-reduced-motion (see @media block at bottom of file). */
+.signal-icon.fade-in {
+  animation: signalIconFadeIn 200ms ease;
+}
+
+@keyframes signalIconFadeIn {
+  from { opacity: 0;   transform: scale(0.9); }
+  to   { opacity: 1;   transform: scale(1); }
 }
 
 /* Cockpit-style message panel. */
@@ -438,7 +481,8 @@ body {
   .signal-char.active-gap,
   .signal-char.just-filled,
   .signal-message.complete,
-  .signal-letter.wrong {
+  .signal-letter.wrong,
+  .signal-icon.fade-in {
     animation: none !important;
     transition: none !important;
   }
