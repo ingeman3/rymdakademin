@@ -78,6 +78,18 @@ button:active {
   box-shadow: 0 4px 0 #07152c;
 }
 
+button:focus-visible,
+.planet:focus-visible {
+  outline: 3px solid var(--amber);
+  outline-offset: 4px;
+  box-shadow: 0 0 0 6px rgba(255, 209, 102, 0.32), 0 8px 0 #07152c, 0 0 22px rgba(101, 247, 255, 0.22);
+}
+
+.planet:focus-visible {
+  outline-offset: 6px;
+  box-shadow: 0 0 0 6px rgba(255, 209, 102, 0.32);
+}
+
 .solar-game {
   position: relative;
   z-index: 1;
@@ -451,7 +463,6 @@ button:active {
 
 .planet.selectable:hover,
 .planet.selectable:focus-visible {
-  outline: none;
   transform: translate(-50%, -50%) scale(1.06);
 }
 
