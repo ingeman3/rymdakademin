@@ -4,7 +4,7 @@ const express = require('express');
 const helmet = require('helmet');
 require('dotenv').config();
 
-const { query } = require('./db');
+const { query, pool } = require('./db');
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
@@ -78,6 +78,38 @@ app.get('*', (_req, res) => {
   res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Rymdakademin körs på port ${port}`);
 });
+
+let shuttingDown = false;
+
+function shutdown(signal) {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  console.log(`${signal} mottagen, stänger ner...`);
+
+  const forceExit = setTimeout(() => {
+    console.error('Graceful shutdown timed out after 10s, forcing exit.');
+    process.exit(1);
+  }, 10000);
+  forceExit.unref();
+
+  server.close((err) => {
+    if (err) console.error('HTTP server close error:', err);
+    pool.end().then(
+      () => {
+        clearTimeout(forceExit);
+        process.exit(0);
+      },
+      (poolErr) => {
+        console.error('Pool end error:', poolErr);
+        clearTimeout(forceExit);
+        process.exit(1);
+      }
+    );
+  });
+}
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
