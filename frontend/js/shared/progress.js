@@ -85,7 +85,15 @@ function migrateFromPhase4() {
 
   const snap = emptySnapshot();
   for (const entry of legacyPilots) {
-    if (!entry || typeof entry.id !== 'string' || typeof entry.name !== 'string') continue;
+    // Must have id and name; both must be non-empty strings after
+    // trimming. Previously we relied on DEFAULT_PILOTS seeding to
+    // backfill any empty result, but with DEFAULT_PILOTS gone the
+    // migration is the only path for existing users — drop invalid
+    // entries silently so the empty-state UI appears rather than a
+    // corrupt pilot.
+    if (!entry) continue;
+    if (typeof entry.id !== 'string' || entry.id.trim().length === 0) continue;
+    if (typeof entry.name !== 'string' || entry.name.trim().length === 0) continue;
     snap.pilots[entry.id] = freshPilot({
       id: entry.id,
       name: entry.name,
