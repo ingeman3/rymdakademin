@@ -5,6 +5,10 @@ import {
   planetPoint,
 } from './solar-system-data.js';
 import { createSolarSystemUi } from './solar-system-ui.js';
+import { addStars, getSelectedPilotId } from '../../shared/progress.js';
+
+const GAME_ID = 'solar-system';
+const STARS_PER_COMPLETION = 7;
 
 export function startSolarSystemGame() {
   const state = {
@@ -120,6 +124,14 @@ export function startSolarSystemGame() {
   function finishGame() {
     state.locked = true;
     state.visualStars = state.completedPlanets.size;
+
+    // Persist the session. Stars accumulate across replays — a 5-year-
+    // old who plays five times deserves to see 35, not plateau at 7.
+    const pilotId = getSelectedPilotId();
+    if (pilotId) {
+      addStars(pilotId, GAME_ID, STARS_PER_COMPLETION);
+    }
+
     ui.showFinish();
     render();
   }
