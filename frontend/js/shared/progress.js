@@ -59,7 +59,11 @@ function freshPilot({ id, name, color, icon }) {
     totalStars: 0,
     rank: 'kadett',
     createdAt: now,
-    lastPlayedAt: now,
+    // lastPlayedAt stays null until a game actually stamps it via
+    // addStars/setGameProgress. This way a brand-new seeded roster has
+    // no "activity time" and loses to any real server snapshot during
+    // sync conflict resolution.
+    lastPlayedAt: null,
     games: {},
   };
 }
@@ -240,6 +244,7 @@ function fireChange() {
 export async function syncFromServer() {
   try {
     const res = await fetch('/api/progress', { credentials: 'include' });
+    if (res.status === 401) return { synced: false, reason: 'unauthenticated' };
     if (res.status === 404) return { synced: false, reason: 'no-server-data' };
     if (!res.ok) return { synced: false, reason: 'error' };
     const { snapshot: remote, updatedAt } = await res.json();
@@ -267,6 +272,7 @@ export async function syncToServer() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ snapshot: getSnapshot() }),
     });
+    if (res.status === 401) return { ok: false, error: 'unauthenticated' };
     if (!res.ok) return { ok: false, error: `HTTP ${res.status}` };
     return { ok: true };
   } catch (err) {
@@ -274,10 +280,52 @@ export async function syncToServer() {
   }
 }
 
+// ---- Auto-sync opt-in ----------------------------------------------------
+// Both entrypoints (start.js and app.js) call enableServerSync() once on
+// init. The first call pulls the server snapshot in the background; every
+// subsequent onChange triggers a debounced PUT. Idempotent — repeat calls
+// are no-ops.
+let autoSyncEnabled = false;
+let autoSyncPending = false;
+const AUTO_SYNC_DEBOUNCE_MS = 200;
+
+export function enableServerSync() {
+  if (autoSyncEnabled) return;
+  autoSyncEnabled = true;
+
+  // 401 is the expected state when running without CF Access in front
+  // (local dev without cloudflared, or a deployment awaiting CF
+  // config). Only loud for genuine network / 5xx failures.
+  syncFromServer().then((result) => {
+    if (result && result.reason === 'error') {
+      // eslint-disable-next-line no-console
+      console.warn('progress: initial sync from server failed.');
+    }
+  });
+
+  onChange(() => {
+    if (autoSyncPending) return;
+    autoSyncPending = true;
+    window.setTimeout(() => {
+      autoSyncPending = false;
+      syncToServer().then((result) => {
+        if (result && !result.ok && result.error !== 'unauthenticated') {
+          // eslint-disable-next-line no-console
+          console.warn('progress: sync to server failed:', result.error);
+        }
+      });
+    }, AUTO_SYNC_DEBOUNCE_MS);
+  });
+}
+
 function newestPilotTimestamp(snap) {
   let max = 0;
   for (const p of Object.values(snap.pilots || {})) {
-    const t = Date.parse(p.lastPlayedAt || p.createdAt || 0);
+    // Only count pilots who have actually played something. Seed +
+    // migration paths leave lastPlayedAt null on purpose so a newly
+    // initialised client always yields to a real server snapshot.
+    if (!p.lastPlayedAt) continue;
+    const t = Date.parse(p.lastPlayedAt);
     if (Number.isFinite(t) && t > max) max = t;
   }
   return max;

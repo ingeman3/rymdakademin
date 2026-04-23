@@ -6,6 +6,7 @@ import {
   createPilot,
   getRank,
   onChange,
+  enableServerSync,
 } from '../shared/progress.js';
 
 const MISSIONS = [
@@ -228,3 +229,8 @@ onChange(renderPilots);
 
 renderPilots();
 renderMissions();
+
+// Pull any newer snapshot from the server in the background and push
+// future local changes back. See enableServerSync() in progress.js —
+// idempotent, shared between start and game pages.
+enableServerSync();
