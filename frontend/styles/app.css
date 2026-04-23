@@ -515,8 +515,8 @@ button:focus-visible,
 .planet.locked-home .planet-name::after {
   display: block;
   color: var(--muted);
-  font-size: 0.72rem;
-  content: "Låst";
+  font-size: 0.82rem;
+  content: "🔒 Kom sen";
 }
 
 .planet.unlocked-home:not(.current)::before {

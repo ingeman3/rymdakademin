@@ -133,11 +133,11 @@ export function createSolarSystemUi(handlers) {
   function showIntro(totalStars) {
     setPopupPlanet(HOME_PLANET_INDEX);
     missionText.textContent = 'Uppdrag från Jorden';
-    planetFactText.textContent = 'Besök alla andra planeter och lös deras matteuppdrag. När alla stjärnor är samlade får du återvända hem till Jorden.';
+    planetFactText.textContent = 'Flyg till alla planeter och lös ett mattetal på varje. Samla alla stjärnor. Kom sen hem till Jorden.';
     mathPromptText.textContent = 'Solsystemsresan';
-    questionText.textContent = `${totalStars} uppdrag väntar`;
-    feedbackText.textContent = 'Klicka på startknappen när du är redo, pilot.';
-    speechText.textContent = 'Uppdrag från Jorden. Besök alla andra planeter och lös deras matteuppdrag. När alla stjärnor är samlade får du återvända hem till Jorden.';
+    questionText.textContent = `${totalStars} planeter väntar`;
+    feedbackText.textContent = 'Tryck på knappen när du vill börja.';
+    speechText.textContent = 'Uppdrag från Jorden. Flyg till alla planeter och lös ett mattetal på varje. Samla alla stjärnor. Kom sen hem till Jorden.';
     controlPanel.classList.remove('success', 'correct-pulse', 'wrong-pulse');
     answers.innerHTML = '';
     answers.appendChild(createActionButton('Starta uppdraget', handlers.onMissionStarted));
