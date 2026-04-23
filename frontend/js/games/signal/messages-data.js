@@ -2,15 +2,23 @@
 // Rymdsignalen. Each tier defines:
 //   panelSize       — how many letter buttons the panel shows
 //   alphabet        — the pool distractors are drawn from
-//   messages        — an array of { text, gaps } objects where gaps
-//                     is the 0-indexed positions that start hidden.
-//                     Spaces in phrases are NEVER gaps.
+//   messages        — an array of { text, gaps, icon } objects where
+//                     gaps is the 0-indexed positions that start
+//                     hidden. Spaces in phrases are NEVER gaps.
+//                     icon is a key into ICONS (added in the next
+//                     commit) that renders above the message panel.
 //
-// Design note: the letter panel is computed at session start from the
-// union of the 7 messages' letters + random distractors to reach
-// panelSize. The panel is stable across the whole session so the
-// child learns the layout. Messages are chosen to have enough overlap
-// that the union + distractors fits within panelSize.
+// Phase 9 rewrite: every message is space-themed. Ambiguous Swedish
+// words that shared letters across multiple valid guesses (MÅS, MIN,
+// IS standalone, etc.) are gone. The icon above the message panel
+// gives a 4-year-old a visual anchor for what the word represents —
+// the letter panel is now a tool for spelling, not guessing.
+//
+// Panel-size note: the new wordlists need more unique letters than
+// the phase 7 sizes (kadett union is 15 letters; pilot 21; kapten
+// 17). panelSize was bumped per-tier to cover the union + a small
+// distractor pool. The rank progression is preserved in relative
+// terms (kadett 16 < pilot 22 < kapten 20 ≈ rymdforskare/amiral 29).
 
 export const ALPHABET_ALL = [
   'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O',
@@ -29,115 +37,87 @@ export const ALPHABET_COMMON = [
 export const SESSION_LENGTH = 7;
 
 // ---- kadett -------------------------------------------------------
-// 3-5 characters, 1 gap per message. Panel-size 8 is tight, so
-// messages were chosen from a small letter set (A, I, L, M, N, O, S,
-// Å) that makes multiple familiar Swedish words.
+// 3-5 characters, 1 gap per message. All space-themed.
 const kadettMessages = [
-  { text: 'SOL',   gaps: [1] },  // S_L
-  { text: 'MÅN',   gaps: [1] },  // M_N
-  { text: 'NÅL',   gaps: [1] },  // N_L
-  { text: 'MÅS',   gaps: [1] },  // M_S (seagull)
-  { text: 'MIN',   gaps: [1] },  // M_N (mine)
-  { text: 'MAN',   gaps: [1] },  // M_N
-  { text: 'SAL',   gaps: [1] },  // S_L (hall)
-  { text: 'LAM',   gaps: [1] },  // L_M
-  { text: 'NASA',  gaps: [1] },  // N_SA
-  { text: 'ÅSNA',  gaps: [0] },  // _SNA (donkey)
-  { text: 'MOLN',  gaps: [2] },  // MO_N (cloud)
-  { text: 'SIMON', gaps: [2] },  // SI_ON
-  { text: 'LÅSA',  gaps: [2] },  // LÅ_A
-  { text: 'ANIS',  gaps: [2] },  // AN_S
-  { text: 'LISA',  gaps: [2] },  // LI_A
+  { text: 'SOL',  gaps: [1], icon: 'sun' },     // S_L
+  { text: 'MÅN',  gaps: [1], icon: 'moon' },    // M_N
+  { text: 'UFO',  gaps: [1], icon: 'ufo' },     // U_O
+  { text: 'JORD', gaps: [2], icon: 'earth' },   // JO_D
+  { text: 'MARS', gaps: [2], icon: 'mars' },    // MA_S
+  { text: 'RING', gaps: [1], icon: 'ring' },    // R_NG
+  { text: 'BANA', gaps: [1], icon: 'orbit' },   // B_NA
 ];
 
 // ---- pilot --------------------------------------------------------
-// 4-6 chars, 1-2 gaps. 12 letters in panel.
+// 4-7 chars, 1-2 gaps.
 const pilotMessages = [
-  { text: 'JORDEN', gaps: [1, 4] },    // J_RD_N
-  { text: 'MODER',  gaps: [2] },       // MO_ER
-  { text: 'DATOR',  gaps: [3] },       // DAT_R (computer)
-  { text: 'MODEM',  gaps: [2] },       // MO_EM
-  { text: 'TANTE',  gaps: [2] },       // TA_TE
-  { text: 'NORDEN', gaps: [1, 4] },    // N_RD_N
-  { text: 'RODER',  gaps: [3] },       // ROD_R (rudder)
-  { text: 'STEN',   gaps: [1] },       // S_EN
-  { text: 'MORA',   gaps: [2] },       // MO_A
-  { text: 'LISA',   gaps: [2] },       // LI_A
-  { text: 'SIRIN',  gaps: [2] },       // SI_IN
-  { text: 'ASTRO',  gaps: [0, 3] },    // _STR_
-  { text: 'JORD',   gaps: [2] },       // JO_D
-  { text: 'TOR',    gaps: [1] },       // T_R (Norse god)
-  { text: 'DROMEDAR', gaps: [3, 6] }, // DRO_ED_R — actually 8 chars, borderline pilot
+  { text: 'RAKET',   gaps: [1],    icon: 'rocket' },   // R_KET
+  { text: 'KOMET',   gaps: [2],    icon: 'comet' },    // KO_ET
+  { text: 'SKEPP',   gaps: [2],    icon: 'ship' },     // SK_PP
+  { text: 'PLANET',  gaps: [2, 5], icon: 'planet' },   // PL_NE_
+  { text: 'GALAX',   gaps: [2],    icon: 'galaxy' },   // GA_AX
+  { text: 'METEOR',  gaps: [1, 4], icon: 'meteor' },   // M_TE_R
+  { text: 'KRATER',  gaps: [1, 4], icon: 'crater' },   // K_AT_R
+  { text: 'RYMDEN',  gaps: [1, 4], icon: 'space' },    // R_MD_N
+  { text: 'HIMLEN',  gaps: [1, 4], icon: 'sky' },      // H_ML_N
+  { text: 'STJÄRNA', gaps: [2, 5], icon: 'star' },     // ST_ÄR_A
+  { text: 'VENUS',   gaps: [1, 3], icon: 'venus' },    // V_N_S
+  { text: 'PLUTO',   gaps: [1, 3], icon: 'pluto' },    // P_U_O
 ];
 
 // ---- kapten -------------------------------------------------------
-// 5-8 chars, 2-3 gaps. 16 letters in panel.
+// 5-9 chars, 2-3 gaps.
 const kaptenMessages = [
-  { text: 'JUPITER',  gaps: [1, 4] },       // J_PI_ER
-  { text: 'KOMETEN',  gaps: [1, 5] },       // K_MET_N
-  { text: 'PLANETER', gaps: [1, 6] },       // P_ANETE_
-  { text: 'SATURNUS', gaps: [1, 4, 7] },    // S_TUR_U_
-  { text: 'NEPTUNUS', gaps: [2, 5] },       // NE_TU_US
-  { text: 'URANUS',   gaps: [0, 3] },       // _RA_US
-  { text: 'STJÄRNA',  gaps: [2, 5] },       // ST_ÄR_A
-  { text: 'STJÄRNOR', gaps: [2, 5] },       // ST_ÄR_OR
-  { text: 'RAKETEN',  gaps: [1, 4] },       // R_KE_EN
-  { text: 'VÄLKOMMEN', gaps: [1, 4, 7] },   // V_LK_MM_N
-  { text: 'HIMLEN',   gaps: [1, 4] },       // H_ML_N
-  { text: 'MORGON',   gaps: [1, 4] },       // M_RG_N
-  { text: 'HEMMA',    gaps: [1, 3] },       // H_M_A
-  { text: 'KVÄLL',    gaps: [1, 3] },       // K_Ä_L
-  { text: 'GALAX',    gaps: [1, 3] },       // G_L_X — lower-freq
+  { text: 'ASTRONAUT', gaps: [1, 4, 7], icon: 'astronaut' }, // A_TR_NA_T
+  { text: 'SATURNUS',  gaps: [1, 4, 6], icon: 'saturnus' },  // S_TU_N_S
+  { text: 'JUPITER',   gaps: [1, 4],    icon: 'jupiter' },   // J_PI_ER
+  { text: 'NEPTUNUS',  gaps: [2, 5],    icon: 'neptunus' },  // NE_TU_US
+  { text: 'MERKURIUS', gaps: [1, 4, 7], icon: 'merkurius' }, // M_RK_RI_S
+  { text: 'UNIVERSUM', gaps: [1, 4, 7], icon: 'universum' }, // U_IV_RS_M
+  { text: 'NEBULOSA',  gaps: [1, 4],    icon: 'nebulosa' },  // N_BU_OSA
+  { text: 'SPUTNIK',   gaps: [1, 4],    icon: 'sputnik' },   // S_UT_IK
+  { text: 'TELESKOP',  gaps: [1, 4],    icon: 'teleskop' },  // T_LE_KOP
+  { text: 'RADAR',     gaps: [1, 3],    icon: 'radar' },     // R_D_R
+  { text: 'STATION',   gaps: [1, 4],    icon: 'station' },   // S_AT_ON
 ];
 
 // ---- rymdforskare -------------------------------------------------
 // Short phrases, 2-3 gaps. Full alphabet available.
 const rymdforskareMessages = [
-  { text: 'HEJ JORDEN',      gaps: [0, 4] },      // _EJ _ORDEN
-  { text: 'KOMMA HEM',       gaps: [2, 6] },      // KO_MA _EM
-  { text: 'BRA JOBBAT',      gaps: [1, 4, 8] },   // B_A _OBBA_
-  { text: 'RYMDEN ÄR HEM',   gaps: [0, 7, 10] },  // _YMDEN _R _EM
-  { text: 'MÅNEN LYSER',     gaps: [0, 6] },      // _ÅNEN _YSER
-  { text: 'SOLEN VÄRMER',    gaps: [0, 6] },      // _OLEN _ÄRMER
-  { text: 'JORDEN RUNT',     gaps: [0, 7] },      // _ORDEN _UNT
-  { text: 'KALLT PÅ MARS',   gaps: [0, 6, 9] },   // _ALLT _Å _ARS
-  { text: 'RAKET I RYMD',    gaps: [0, 8] },      // _AKET I _YMD
-  { text: 'PILOT I RYMDEN',  gaps: [0, 8] },      // _ILOT I _YMDEN
-  { text: 'STJÄRNA LYSER',   gaps: [0, 8] },      // _TJÄRNA _YSER
-  { text: 'KOMETEN FLYR',    gaps: [0, 8] },      // _OMETEN _LYR
-  { text: 'PLANET JORDEN',   gaps: [0, 7] },      // _LANET _ORDEN
+  { text: 'HEJ SOL',     gaps: [0, 4],    icon: 'greeting-sun' },    // _EJ _OL
+  { text: 'TILL MÅNEN',  gaps: [0, 5],    icon: 'to-moon' },         // _ILL _ÅNEN
+  { text: 'BRA JOBBAT',  gaps: [0, 4],    icon: 'thumbs-up-helmet' },// _RA _OBBAT
+  { text: 'VI FLYGER',   gaps: [0, 3],    icon: 'rocket-motion' },   // _I _LYGER
+  { text: 'KOMMA HEM',   gaps: [0, 6],    icon: 'earth-return' },    // _OMMA _EM
+  { text: 'NYTT UPPDRAG',gaps: [0, 5],    icon: 'mission-star' },    // _YTT _PPDRAG
+  { text: 'HEJ RYMDEN',  gaps: [0, 4],    icon: 'space' },           // _EJ _YMDEN
 ];
 
 // ---- amiral -------------------------------------------------------
 // Longer phrases, 3-5 gaps. Full alphabet.
 const amiralMessages = [
-  { text: 'VÄLKOMMEN HEM PILOT',  gaps: [0, 3, 10, 14] },  // _ÄL_OMMEN _EM _ILOT
-  { text: 'STJÄRNORNA VÄNTAR',    gaps: [0, 3, 11, 14] },  // _TJ_RNORNA _ÄN_AR
-  { text: 'SOLEN ÄR EN STJÄRNA',  gaps: [0, 6, 9, 12, 15] }, // _OLEN _R _N _TJ_RNA
-  { text: 'MÅNEN SNURRAR RUNT',   gaps: [0, 6, 13, 16] },  // _ÅNEN _NURRAR _UN_
-  { text: 'PLANETER I OMLOPP',    gaps: [0, 5, 11, 14] },  // _LANE_ER I _ML_PP
-  { text: 'JUPITER HAR MÅNAR',    gaps: [0, 8, 12, 15] },  // _UPITER _AR _ÅN_R
-  { text: 'RAKETEN FLYGER HEM',   gaps: [0, 8, 14, 16] },  // _AKETEN _LYGER _E_
-  { text: 'SATURNUS HAR RINGAR',  gaps: [0, 5, 9, 13, 16] }, // _ATUR_US _AR _IN_A_
-  { text: 'MERKURIUS ÄR VARM',    gaps: [0, 4, 10, 14] },  // _ERK_RIUS _R _AR_
-  { text: 'BRA JOBBAT PILOT',     gaps: [0, 4, 11, 14] },  // _RA _OBBAT _IL_T
-  { text: 'SKEPPET ÄR SNABBT',    gaps: [0, 4, 8, 12, 15] }, // _KEP_ET _R _NAB_T
-  { text: 'ASTRONAUTER LANDAR',   gaps: [0, 5, 12, 15, 17] }, // _STRO_AUTER _AN_A_
+  { text: 'VÄLKOMMEN HEM PILOT',   gaps: [0, 3, 10, 14],    icon: 'earth-landing' },  // _ÄL_OMMEN _EM _ILOT
+  { text: 'STJÄRNORNA VÄNTAR',     gaps: [0, 3, 11, 14],    icon: 'star-field' },     // _TJ_RNORNA _ÄN_AR
+  { text: 'UPPDRAG SLUTFÖRT',      gaps: [0, 4, 8, 12],     icon: 'helmet-check' },   // _PPD_AG _LUT_ÖRT
+  { text: 'TACK PILOT',            gaps: [0, 2, 5, 8],      icon: 'helmet-heart' },   // _A_K _IL_T
+  { text: 'NÄSTA GALAX',           gaps: [0, 3, 6, 9],      icon: 'galaxy-arrow' },   // _ÄS_A _AL_X
+  { text: 'SOLEN ÄR EN STJÄRNA',   gaps: [0, 6, 9, 12, 14], icon: 'sun' },            // _OLEN _R _N _T_ÄRNA
+  { text: 'RAKETEN FLYGER HEM',    gaps: [0, 8, 13, 15],    icon: 'rocket' },         // _AKETEN _LYGE_ _EM
 ];
 
 export const TIERS = {
   kadett: {
-    panelSize: 8,
+    panelSize: 16,
     alphabet: ALPHABET_COMMON,
     messages: kadettMessages,
   },
   pilot: {
-    panelSize: 12,
+    panelSize: 22,
     alphabet: ALPHABET_COMMON,
     messages: pilotMessages,
   },
   kapten: {
-    panelSize: 16,
+    panelSize: 20,
     alphabet: ALPHABET_COMMON,
     messages: kaptenMessages,
   },
